@@ -1,0 +1,400 @@
+/*
+ * sidebar.css — node library panel: search row, the four groups, compact
+ * section rows, recently used nodes and the collapsed icon rail.
+ * Imported after layout.css, so these rules win over the older section styles.
+ */
+
+.panel-left {
+  padding: 12px 10px 12px 12px;
+  gap: 0;
+}
+
+/* ── Search + collapse ───────────────────────────────────────────────────── */
+
+.sidebar-top-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.sidebar-top-row .global-search-box {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.panel-left .global-search-box .search-input {
+  height: 34px;
+  padding: 0 44px 0 30px;
+  font-size: 13px;
+  border-color: #e2e8f0;
+  background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") no-repeat 10px center;
+}
+
+.panel-left .global-search-box .search-input:focus {
+  border-color: #a5b4fc;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.global-search-kbd {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: inherit;
+  font-size: 11px;
+  color: #64748b;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 5px;
+  padding: 1px 5px;
+  pointer-events: none;
+}
+
+.sidebar-collapse-btn,
+.sidebar-rail-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #64748b;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.sidebar-collapse-btn:hover,
+.sidebar-rail-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.sidebar-collapse-btn:focus-visible,
+.sidebar-rail-btn:focus-visible,
+.sidebar-group-header:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+/* ── Groups ──────────────────────────────────────────────────────────────── */
+
+.sidebar-group + .sidebar-group {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.sidebar-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 6px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.sidebar-group-header:hover {
+  color: #0f172a;
+}
+
+.sidebar-group-chevron {
+  font-size: 14px;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.sidebar-group--open .sidebar-group-chevron {
+  transform: rotate(90deg);
+}
+
+.sidebar-group-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-bottom: 4px;
+}
+
+/* ── Section rows inside a group ─────────────────────────────────────────── */
+
+.panel-left .section-title-row.collapsible,
+.panel-left .section-title-row.collapsible.mt-section {
+  margin: 0;
+  height: 32px;
+  padding: 0 8px 0 6px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+}
+
+.panel-left .section-title-row.collapsible:hover {
+  background: #f1f5f9;
+  border: none;
+}
+
+.panel-left .section-title-left {
+  gap: 6px;
+  min-width: 0;
+}
+
+.panel-left .section-chevron {
+  font-size: 8px;
+  color: #94a3b8;
+  width: 10px;
+  flex-shrink: 0;
+}
+
+.panel-left .section-heading {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.panel-left .section-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-left .section-heading svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.panel-left .section-title-row.collapsible:hover .section-heading svg {
+  color: #4f46e5;
+}
+
+.panel-left .section-subcount {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  background: none;
+  border: none;
+  padding: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.panel-left .section-body {
+  padding: 6px 2px 10px 18px;
+}
+
+/* ── Recently used ───────────────────────────────────────────────────────── */
+
+.sidebar-recent {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.sidebar-recent-title {
+  padding: 0 6px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sidebar-recent-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 7px;
+  font-size: 13px;
+  color: #334155;
+  cursor: grab;
+}
+
+.sidebar-recent-item:hover {
+  background: #f1f5f9;
+}
+
+.sidebar-recent-icon {
+  display: inline-flex;
+  justify-content: center;
+  width: 18px;
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.sidebar-recent-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Collapsed rail ──────────────────────────────────────────────────────── */
+
+.panel-left--rail {
+  padding: 8px 0;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.sidebar-rail-divider {
+  width: 20px;
+  height: 1px;
+  background: #e2e8f0;
+  margin: 4px 0;
+}
+
+/* ── App switcher (canvas header) ────────────────────────────────────────── */
+
+.app-switcher {
+  position: relative;
+  min-width: 0;
+}
+
+.app-switcher-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 320px;
+  padding: 4px 8px;
+  margin-left: -8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.app-switcher-trigger:hover,
+.app-switcher-trigger[aria-expanded="true"] {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.app-switcher-trigger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+.app-switcher-caret {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.app-switcher-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: -8px;
+  z-index: 50;
+  width: 280px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+}
+
+.app-switcher-label {
+  padding: 6px 8px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.app-switcher-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #0f172a;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.app-switcher-item:hover,
+.app-switcher-item:focus-visible {
+  background: #f1f5f9;
+  outline: none;
+}
+
+.app-switcher-item--current {
+  background: #eef2ff;
+  font-weight: 600;
+}
+
+.app-switcher-item--accent {
+  color: #4338ca;
+  font-weight: 500;
+}
+
+.app-switcher-item-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-switcher-status {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+.app-switcher-status--published {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.app-switcher-status--draft {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.app-switcher-sep {
+  height: 1px;
+  margin: 4px 0;
+  background: #f1f5f9;
+}
+
+/* "Browse packages" link at the end of the Tools / MCP sections */
+.sidebar-packages-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border: 1px dashed #c7d2fe;
+  border-radius: 8px;
+  background: #f8faff;
+  color: #4338ca;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+.sidebar-packages-btn:hover { background: #eef2ff; border-color: #818cf8; }

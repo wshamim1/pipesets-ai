@@ -1,0 +1,56 @@
+# Job-queue workers: scheduled / webhook runs, notifications and Human Gate timeouts, plus the
+# periodic loops (scheduler tick, sweeps) — they take turns with the backend pods, so each
+# firing and each job still runs once however many replicas run.
+#
+# Opt-in, and only with a shared database: the default backend keeps SQLite on a
+# ReadWriteOnce volume, which a second pod can't open. To use it:
+#   1. Set DATABASE_URL (PostgreSQL) in backend-secrets, and in config.yaml:
+#        PIPESETS_WORKER: external      # backend pods only enqueue
+#        PIPESETS_SHARED_STATE: database   # or redis, with REDIS_URL — cancels reach the workers
+#   2. Add `- worker.yaml` to kustomization.yaml and `kubectl apply -k deploy/k8s`
+# Workers serve no port; NetworkPolicy lets them reach the sandbox (sandbox.yaml).
+# Pipelines that read files uploaded to the backend's /data need that volume shared too.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: pipesets-ai
+  labels: {app: worker}
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: worker}
+  template:
+    metadata:
+      labels: {app: worker}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9100"
+        prometheus.io/path: /metrics
+    spec:
+      automountServiceAccountToken: false
+      # SIGTERM stops claiming; running jobs get WORKER_GRACE_SECONDS (30) before they're
+      # left to be retried elsewhere once their leases expire
+      terminationGracePeriodSeconds: 40
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: worker
+          image: pipesets-ai-backend:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "manage.py", "worker"]
+          envFrom:
+            - configMapRef: {name: backend-config}
+            - secretRef: {name: backend-secrets, optional: true}
+          env:
+            - {name: WORKER_CONCURRENCY, value: "4"}
+            - {name: WORKER_METRICS_PORT, value: "9100"}   # job outcomes and queue depth for Prometheus
+          ports:
+            - {name: metrics, containerPort: 9100}
+          resources:
+            requests: {cpu: 250m, memory: 512Mi}
+            limits: {memory: 2Gi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}

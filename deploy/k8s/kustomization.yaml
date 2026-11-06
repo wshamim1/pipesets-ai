@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - config.yaml
+  - backend.yaml
+  - sandbox.yaml
+  - frontend.yaml
+  - networkpolicy.yaml
+# With PostgreSQL (DATABASE_URL), job workers in their own pods — see worker.yaml:
+#  - worker.yaml
+# Point at your registry when pushing images, e.g.:
+# images:
+#   - name: pipesets-ai-backend
+#     newName: registry.example.com/pipesets-ai-backend
+#     newTag: "0.7.0"
+#   - name: pipesets-ai-sandbox
+#     newName: registry.example.com/pipesets-ai-sandbox
+#     newTag: "0.7.0"
+#   - name: pipesets-ai-frontend
+#     newName: registry.example.com/pipesets-ai-frontend
+#     newTag: "0.7.0"

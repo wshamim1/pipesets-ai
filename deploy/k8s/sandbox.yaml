@@ -1,0 +1,87 @@
+# Sandbox runner: runs python_interpreter / custom tool code in throwaway containers with its own
+# rootless podman (backend/sandbox_runner.py, image from backend/Dockerfile.sandbox).
+#
+# Nested podman needs /dev/fuse and an unconfined seccomp / AppArmor profile, which plain k8s
+# only grants a privileged container. That is why this pod — and only this pod — is privileged.
+# It holds no secrets except SANDBOX_TOKEN, mounts no backend data, and the NetworkPolicy below
+# admits traffic from the backend only. Clusters with a fuse device plugin can drop privileged
+# and request the device; clusters with gVisor can set runtimeClassName: gvisor for a second
+# layer around the whole runner.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sandbox
+  namespace: pipesets-ai
+  labels: {app: sandbox}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: sandbox}
+  template:
+    metadata:
+      labels: {app: sandbox}
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/sandbox: unconfined
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: sandbox
+          image: pipesets-ai-sandbox:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8090
+          env:
+            - name: SANDBOX_TOKEN
+              valueFrom:
+                secretKeyRef: {name: backend-secrets, key: SANDBOX_TOKEN}
+          volumeMounts:
+            - {name: images, mountPath: /home/podman/.local/share/containers}
+          readinessProbe:
+            httpGet: {path: /health, port: 8090}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /health, port: 8090}
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          resources:
+            requests: {cpu: 250m, memory: 512Mi}
+            limits: {memory: 4Gi}
+          securityContext:
+            privileged: true
+            runAsUser: 1000          # the image's "podman" user; podman runs rootless
+            runAsGroup: 1000
+      volumes:
+        # Cached base / requirements images; an emptyDir means they're rebuilt after a restart
+        - name: images
+          emptyDir: {sizeLimit: 20Gi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sandbox
+  namespace: pipesets-ai
+spec:
+  selector: {app: sandbox}
+  ports:
+    - {port: 8090, targetPort: 8090}
+---
+# Only the backend (and job workers, worker.yaml) may call the runner. (Egress stays open: tools call external APIs and the
+# runner pulls images. Needs a CNI that enforces NetworkPolicy.)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sandbox-from-backend-only
+  namespace: pipesets-ai
+spec:
+  podSelector:
+    matchLabels: {app: sandbox}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: {app: backend}
+        - podSelector:
+            matchLabels: {app: worker}
+      ports:
+        - {protocol: TCP, port: 8090}

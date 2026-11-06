@@ -1,0 +1,29 @@
+# Sandbox runner (sandbox_runner.py): runs Python for the backend in throwaway containers with
+# its own rootless podman, so the backend needs no container engine.
+#
+#   docker build -f Dockerfile.sandbox -t pipesets-ai-sandbox .        (context: backend/)
+#
+# Nested rootless podman needs: --device /dev/fuse, --security-opt label=disable and
+# seccomp=unconfined (see deploy/compose/compose.yaml and deploy/k8s/sandbox.yaml).
+FROM quay.io/podman/stable:v5.4
+
+RUN dnf install -y --setopt=install_weak_deps=False python3 python3-packaging \
+    && dnf clean all
+
+WORKDIR /app
+COPY paths.py sandbox_runner.py ./
+COPY services/__init__.py services/sandbox.py services/child_env.py services/
+
+# Cached base / requirements images live in the podman user's storage: mount a volume at
+# /home/podman/.local/share/containers to keep them across restarts.
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIPESETS_DATA_DIR=/tmp/pipesets-sandbox \
+    SANDBOX_RUNNER_PORT=8090
+USER podman
+EXPOSE 8090
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
+    CMD python3 -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8090/health', timeout=8)"
+
+CMD ["python3", "/app/sandbox_runner.py"]

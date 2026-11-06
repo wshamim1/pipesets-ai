@@ -1,0 +1,49 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "HTTP 401 before any output",
+  "providers": {
+    "anthropic": "claude-haiku-5-5"
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be brief."
+      },
+      {
+        "role": "user",
+        "content": "Say hello."
+      }
+    ],
+    "max_tokens": 64
+  },
+  "responses": {
+    "stream": {
+      "status": 401,
+      "body": {
+        "type": "error",
+        "error": {
+          "type": "authentication_error",
+          "message": "invalid x-api-key"
+        }
+      }
+    },
+    "complete": {
+      "status": 401,
+      "body": {
+        "type": "error",
+        "error": {
+          "type": "authentication_error",
+          "message": "invalid x-api-key"
+        }
+      }
+    }
+  },
+  "expect": {
+    "error": {
+      "status": 401,
+      "retryable": false,
+      "message_contains": "invalid x-api-key"
+    }
+  }
+}

@@ -1,0 +1,454 @@
+/* ================================================================
+   RAG PIPELINE NODE STYLES
+   ================================================================ */
+
+/* ── Shared RAG sidebar card list ─────────────────────────────── */
+.rag-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: calc(100vh - 400px);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* ================================================================
+   DOCUMENT LOADER NODE
+   ================================================================ */
+
+.chip-doc-loader {
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+}
+
+.doc-loader-node-card {
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.08);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.doc-loader-node-card.selected {
+  border-color: #ea580c;
+  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.25), 0 4px 12px rgba(234, 88, 12, 0.12);
+}
+
+.doc-loader-header {
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border-bottom: 1px solid #fed7aa;
+}
+
+.dl-handle {
+  background: #ea580c !important;
+  border-color: #9a3412 !important;
+}
+
+.dl-footer-status {
+  font-size: 10px;
+  color: #9a3412;
+}
+
+.doc-source-label {
+  font-size: 10px;
+  color: #9a3412;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+.doc-loader-drag-card {
+  border-color: #fed7aa;
+  background: linear-gradient(145deg, #fff7ed, #ffedd5);
+}
+
+.doc-loader-drag-card:hover {
+  border-color: #ea580c;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(234, 88, 12, 0.15);
+}
+
+/* Doc Loader config panel status */
+.dl-status-box {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #9a3412;
+  font-weight: 600;
+}
+
+.dl-dot {
+  background: #ea580c !important;
+  box-shadow: 0 0 4px rgba(234, 88, 12, 0.5) !important;
+}
+
+/* ================================================================
+   TEXT SPLITTER NODE
+   ================================================================ */
+
+.chip-text-splitter {
+  background: #fdf4ff;
+  color: #6b21a8;
+  border: 1px solid #e9d5ff;
+}
+
+.text-splitter-node-card {
+  background: #ffffff;
+  border: 1px solid #e9d5ff;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.text-splitter-node-card.selected {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25), 0 4px 12px rgba(124, 58, 237, 0.12);
+}
+
+.text-splitter-header {
+  background: linear-gradient(135deg, #fdf4ff, #f5f3ff);
+  border-bottom: 1px solid #e9d5ff;
+}
+
+.ts-handle {
+  background: #7c3aed !important;
+  border-color: #6b21a8 !important;
+}
+
+.ts-footer-status {
+  font-size: 10px;
+  color: #6b21a8;
+}
+
+.text-splitter-drag-card {
+  border-color: #e9d5ff;
+  background: linear-gradient(145deg, #fdf4ff, #f5f3ff);
+}
+
+.text-splitter-drag-card:hover {
+  border-color: #7c3aed;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(124, 58, 237, 0.15);
+}
+
+/* Text Splitter config panel */
+.ts-status-box {
+  background: #fdf4ff;
+  border: 1px solid #e9d5ff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #6b21a8;
+  font-weight: 600;
+}
+
+.ts-dot {
+  background: #7c3aed !important;
+  box-shadow: 0 0 4px rgba(124, 58, 237, 0.5) !important;
+}
+
+.ts-info-box {
+  background: #f5f3ff;
+  border: 1px solid #ede9fe;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+/* ================================================================
+   EMBEDDING NODE
+   ================================================================ */
+
+.chip-embedding {
+  background: #ecfeff;
+  color: #155e75;
+  border: 1px solid #a5f3fc;
+}
+
+.embedding-node-card {
+  background: #ffffff;
+  border: 1px solid #a5f3fc;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.08);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.embedding-node-card.selected {
+  border-color: #0891b2;
+  box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.25), 0 4px 12px rgba(8, 145, 178, 0.12);
+}
+
+.embedding-header {
+  background: linear-gradient(135deg, #ecfeff, #cffafe);
+  border-bottom: 1px solid #a5f3fc;
+}
+
+.emb-handle {
+  background: #0891b2 !important;
+  border-color: #155e75 !important;
+}
+
+.emb-footer-status {
+  font-size: 10px;
+  color: #155e75;
+}
+
+.embedding-drag-card {
+  border-color: #a5f3fc;
+  background: linear-gradient(145deg, #ecfeff, #cffafe);
+}
+
+.embedding-drag-card:hover {
+  border-color: #0891b2;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(8, 145, 178, 0.15);
+}
+
+/* Embedding config panel */
+.emb-status-box {
+  background: #ecfeff;
+  border: 1px solid #a5f3fc;
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #155e75;
+  font-weight: 600;
+}
+
+.emb-dot {
+  background: #0891b2 !important;
+  box-shadow: 0 0 4px rgba(8, 145, 178, 0.5) !important;
+}
+
+/* ================================================================
+   VECTOR STORE NODE
+   ================================================================ */
+
+.chip-vector-store {
+  background: #f0fdf4;
+  color: #14532d;
+  border: 1px solid #86efac;
+}
+
+.vector-store-node-card {
+  background: #ffffff;
+  border: 1px solid #86efac;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.08);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.vector-store-node-card.selected {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25), 0 4px 12px rgba(22, 163, 74, 0.12);
+}
+
+.vector-store-header {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border-bottom: 1px solid #86efac;
+}
+
+.vs-handle {
+  background: #16a34a !important;
+  border-color: #14532d !important;
+}
+
+.vs-footer-status {
+  font-size: 10px;
+  color: #14532d;
+}
+
+.vector-store-drag-card {
+  border-color: #86efac;
+  background: linear-gradient(145deg, #f0fdf4, #dcfce7);
+}
+
+.vector-store-drag-card:hover {
+  border-color: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(22, 163, 74, 0.15);
+}
+
+/* Vector Store config panel */
+.vs-status-box {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #14532d;
+  font-weight: 600;
+}
+
+.vs-dot {
+  background: #16a34a !important;
+  box-shadow: 0 0 4px rgba(22, 163, 74, 0.5) !important;
+}
+
+/* ================================================================
+   RETRIEVER NODE STYLES
+   ================================================================ */
+
+.chip-retriever {
+  background: #fdf2f8;
+  color: #831843;
+  border: 1px solid #fbcfe8;
+}
+
+.retriever-node-card {
+  background: #ffffff;
+  border: 1px solid #fbcfe8;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(219, 39, 119, 0.08);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.retriever-node-card.selected {
+  border-color: #db2777;
+  box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.25), 0 4px 12px rgba(219, 39, 119, 0.12);
+}
+
+.retriever-header {
+  background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+  border-bottom: 1px solid #fbcfe8;
+}
+
+.ret-handle {
+  background: #db2777 !important;
+  border-color: #831843 !important;
+}
+
+.ret-footer-status {
+  font-size: 10px;
+  color: #831843;
+}
+
+.ret-collection-label {
+  font-size: 10px;
+  color: #831843;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 130px;
+}
+
+.ret-rerank-chip {
+  background: #fce7f3;
+  color: #9d174d;
+  border: 1px solid #fbcfe8;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+.retriever-drag-card {
+  border-color: #fbcfe8;
+  background: linear-gradient(145deg, #fdf2f8, #fce7f3);
+}
+
+.retriever-drag-card:hover {
+  border-color: #db2777;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(219, 39, 119, 0.15);
+}
+
+/* Retriever config panel status */
+.ret-status-box {
+  background: #fdf2f8;
+  border: 1px solid #fbcfe8;
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #831843;
+  font-weight: 600;
+}
+
+.ret-dot {
+  background: #db2777 !important;
+  box-shadow: 0 0 4px rgba(219, 39, 119, 0.5) !important;
+}
+
+
+/* ================================================================
+   RERANKER NODE STYLES
+   ================================================================ */
+
+.chip-reranker {
+  background: #fdf4ff;
+  color: #86198f;
+  border: 1px solid #f0abfc;
+}
+
+.reranker-node-card {
+  background: #ffffff;
+  border: 1px solid #f0abfc;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.08);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.reranker-node-card.selected {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.25), 0 4px 12px rgba(168, 85, 247, 0.12);
+}
+
+.reranker-header {
+  background: linear-gradient(135deg, #fdf4ff, #fae8ff);
+  border-bottom: 1px solid #f0abfc;
+}
+
+.rer-handle {
+  background: #a855f7 !important;
+  border-color: #6b21a8 !important;
+}
+
+.rer-footer-status {
+  font-size: 10px;
+  color: #6b21a8;
+}

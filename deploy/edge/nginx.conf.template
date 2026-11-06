@@ -1,0 +1,78 @@
+# Pipesets AI edge proxy: TLS, and what each hostname exposes.
+#
+#   ${PUBLIC_HOST}  the public API — /v1/* (published apps, /v1/hooks/* webhooks, /v1/chat/* chat links),
+#                   plus the chat-link page (/c/<token>) and the static files it loads. Callers
+#                   authenticate with API keys / webhook / chat-link tokens; nothing else is served.
+#   ${UI_HOST}      the web UI and the /api it calls (sign-in, builder, settings).
+#                   Narrow who can reach it in ui-allow.conf (office / VPN ranges).
+#
+# The two must be different hostnames. Rendered by envsubst at start-up (nginx image templates);
+# certificates come from certbot (certs.sh picks them up, with a self-signed stand-in until then).
+
+server_tokens off;
+
+upstream backend  { server ${BACKEND_ADDR}; }
+upstream frontend { server ${FRONTEND_ADDR}; }
+
+# Port 80: Let's Encrypt challenges; everything else is redirected to HTTPS.
+server {
+    listen 80 default_server;
+    location /.well-known/acme-challenge/ { root /var/www/certbot; }
+    location / { return 301 https://$host$request_uri; }
+}
+
+# Any other hostname, or a bare IP, gets no TLS handshake at all.
+server {
+    listen 443 ssl default_server;
+    ssl_reject_handshake on;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${PUBLIC_HOST};
+    ssl_certificate     /etc/nginx/certs/${PUBLIC_HOST}/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/${PUBLIC_HOST}/privkey.pem;
+    include /etc/nginx/snippets/tls.conf;
+
+    location /v1/hooks/ {
+        client_max_body_size 1m;
+        include /etc/nginx/snippets/proxy.conf;
+        proxy_pass http://backend;
+    }
+    location /v1/chat/ {
+        client_max_body_size 1m;
+        include /etc/nginx/snippets/proxy.conf;
+        proxy_pass http://backend;
+    }
+    location /v1/ {
+        client_max_body_size 25m;
+        include /etc/nginx/snippets/proxy.conf;
+        proxy_pass http://backend;
+    }
+    # Chat links: the page (the frontend answers /c/* with chat.html) and its scripts / styles.
+    # Only static files; the page talks to /v1/chat above, never /api.
+    location ~ ^/(c/[A-Za-z0-9_-]+/?|assets/[^/]+|favicon\.svg)$ {
+        limit_except GET { deny all; }
+        include /etc/nginx/snippets/proxy.conf;
+        proxy_pass http://frontend;
+    }
+    # /api, /docs, /health and the builder UI are not on the public host.
+    location / { return 404; }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${UI_HOST};
+    ssl_certificate     /etc/nginx/certs/${UI_HOST}/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/${UI_HOST}/privkey.pem;
+    include /etc/nginx/snippets/tls.conf;
+    include /etc/nginx/ui-allow.conf;
+
+    location / {
+        client_max_body_size 100m;   # document / knowledge-base uploads
+        include /etc/nginx/snippets/proxy.conf;
+        proxy_pass http://frontend;
+    }
+}

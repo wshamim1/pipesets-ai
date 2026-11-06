@@ -1,0 +1,18 @@
+{
+  "provider": "deepseek",
+  "_about": "Model prices for the LLM gateway (llm/pricing.py), keyed by the model name set on the LLM node. Override or add locally in <data dir>/prices/<provider>.json.",
+  "unit": "USD per 1M tokens",
+  "source": "LiteLLM 1.103.2 model_cost via scripts/seed_prices.py, 2026-10-28",
+  "models": {
+    "deepseek-chat": {"in": 0.28, "out": 0.42, "cache_read": 0.028, "cache_write": 0.0},
+    "deepseek-coder": {"in": 0.14, "out": 0.28, "cache_read": 0.014},
+    "deepseek-flash": {"in": 0.3, "out": 1.2, "cache_read": 0.006, "cache_write": 0.0},
+    "deepseek-r1": {"in": 0.55, "out": 2.19, "cache_read": 0.14},
+    "deepseek-reasoner": {"in": 0.28, "out": 0.42, "cache_read": 0.028},
+    "deepseek-v3": {"in": 0.27, "out": 1.1, "cache_read": 0.07, "cache_write": 0.0},
+    "deepseek-v3.2": {"in": 0.28, "out": 0.4, "cache_read": 0.028},
+    "deepseek-v4-flash": {"in": 0.3, "out": 1.2, "cache_read": 0.006, "cache_write": 0.0},
+    "deepseek-v4-flash-vision-exp": {"in": 0.3, "out": 1.2, "cache_read": 0.006, "cache_write": 0.0},
+    "deepseek-v4-pro": {"in": 1.32, "out": 3.96, "cache_read": 0.044, "cache_write": 0.0}
+  }
+}

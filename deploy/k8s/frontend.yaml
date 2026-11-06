@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: pipesets-ai
+  labels: {app: frontend}
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: frontend}
+  template:
+    metadata:
+      labels: {app: frontend}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: frontend
+          image: pipesets-ai-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - {name: BACKEND_URL, value: "http://backend:8000"}
+          readinessProbe:
+            httpGet: {path: /, port: 8080}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /, port: 8080}
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {memory: 256Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: pipesets-ai
+spec:
+  selector: {app: frontend}
+  ports:
+    - {port: 80, targetPort: 8080}

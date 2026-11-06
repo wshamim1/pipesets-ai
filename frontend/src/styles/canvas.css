@@ -1,0 +1,662 @@
+/*
+ * canvas.css — unified look for the build canvas: header toolbar, prompt bar,
+ * node cards, handles and edges. Imported last so it overrides the per-type
+ * card styles; each node type only sets its --node-accent colour here.
+ */
+
+/* ── Canvas header ───────────────────────────────────────────────────────── */
+
+.canvas-header {
+  padding: 10px 14px 10px 18px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.canvas-title-group {
+  gap: 10px;
+  min-width: 0;
+}
+
+.canvas-title-group .canvas-heading-title {
+  font-size: 15px;
+  font-weight: 650;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}
+
+.node-counter {
+  font-size: 12px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.canvas-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.canvas-tag-type {
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.canvas-actions {
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.canvas-actions-divider {
+  width: 1px;
+  height: 20px;
+  background: #e2e8f0;
+  margin: 0 4px;
+}
+
+.version-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px 2px 18px;
+  border-radius: 999px;
+  position: relative;
+  border: none;
+}
+
+.version-badge::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.version-badge.published {
+  background: #ecfdf5;
+  color: #047857;
+  border: none;
+}
+
+.version-badge.draft {
+  background: #fffbeb;
+  color: #b45309;
+  border: none;
+}
+
+/* One button system: neutral secondary, single solid primary, quiet danger. */
+.save-app-btn,
+.validate-pipeline-btn,
+.export-trigger-btn,
+.clear-btn,
+.publish-btn,
+.edit-pipeline-btn {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 550;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.save-app-btn,
+.validate-pipeline-btn,
+.export-trigger-btn {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.save-app-btn:hover,
+.validate-pipeline-btn:hover,
+.export-trigger-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.publish-btn,
+.edit-pipeline-btn {
+  background: #4f46e5;
+  color: #ffffff;
+  border: 1px solid #4f46e5;
+  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.3);
+}
+
+.publish-btn:hover,
+.edit-pipeline-btn:hover {
+  background: #4338ca;
+  border-color: #4338ca;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+.clear-btn {
+  background: transparent;
+  color: #64748b;
+  border: 1px solid transparent;
+}
+
+.clear-btn:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.save-app-btn:focus-visible,
+.validate-pipeline-btn:focus-visible,
+.export-trigger-btn:focus-visible,
+.clear-btn:focus-visible,
+.publish-btn:focus-visible,
+.edit-pipeline-btn:focus-visible,
+.prompt-import-btn:focus-visible,
+.prompt-build-generate-btn:focus-visible,
+.prompt-mode-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+.save-status-badge {
+  font-size: 12px;
+  font-weight: 500;
+  color: #047857;
+}
+
+.validation-status-badge {
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+
+/* ── Build-with-prompt bar: one compact row ──────────────────────────────── */
+
+.prompt-build-bar {
+  background: #fcfcfd;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 10px 14px 10px 18px;
+}
+
+.prompt-build-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.prompt-build-input {
+  min-height: 38px;
+  max-height: 140px;
+  padding: 9px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.prompt-build-input::placeholder {
+  color: #64748b;
+}
+
+.prompt-build-input:focus {
+  border-color: #a5b4fc;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.prompt-build-actions {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.prompt-build-status {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  color: #3730a3;
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+}
+
+/* Segmented control for the build mode */
+.prompt-build-mode-group {
+  gap: 2px;
+  padding: 3px;
+  background: #f1f5f9;
+  border-radius: 9px;
+  flex-wrap: nowrap;
+}
+
+.prompt-mode-btn {
+  height: 26px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 550;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.prompt-mode-btn:hover {
+  color: #0f172a;
+}
+
+.prompt-mode-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  border: none;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.1);
+}
+
+.prompt-import-btn {
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.prompt-import-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.prompt-build-generate-btn {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: #0f172a;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
+  white-space: nowrap;
+}
+
+.prompt-build-generate-btn:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+.prompt-build-generate-btn:disabled {
+  opacity: 0.35;
+}
+
+@media (max-width: 1100px) {
+  .prompt-build-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Canvas surface ──────────────────────────────────────────────────────── */
+
+.flow-surface {
+  background: var(--canvas-bg);
+}
+
+.flow-surface .react-flow__controls {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.flow-surface .react-flow__controls-button {
+  border-bottom-color: #f1f5f9;
+  width: 28px;
+  height: 28px;
+}
+
+.flow-surface .react-flow__minimap {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.flow-surface .react-flow__minimap-node {
+  fill: #e2e8f0;
+  stroke: none;
+}
+
+/* ── Edges ───────────────────────────────────────────────────────────────── */
+
+.flow-surface .react-flow__edge-path {
+  stroke: #94a3b8;
+  stroke-width: 1.5;
+}
+
+.flow-surface .react-flow__edge:hover .react-flow__edge-path {
+  stroke: #64748b;
+}
+
+.flow-surface .react-flow__edge.selected .react-flow__edge-path {
+  stroke: #6366f1;
+  stroke-width: 2;
+}
+
+.flow-surface .react-flow__edge-textbg {
+  fill: #ffffff;
+  rx: 4;
+}
+
+.flow-surface .react-flow__edge-text {
+  font-size: 11px;
+  font-weight: 600;
+  fill: #475569;
+}
+
+/* × shown at the midpoint of a selected edge (nodes/DeletableEdge.tsx) */
+.edge-delete-btn {
+  position: absolute;
+  pointer-events: all;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1;
+  color: #64748b;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.edge-delete-btn:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+.flow-surface .react-flow__connectionline path {
+  stroke: #6366f1;
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+/* ── Node cards (every type) ─────────────────────────────────────────────── */
+
+.react-flow__node [class*="-node-card"] {
+  --node-accent: #64748b;
+  --node-accent-soft: #f1f5f9;
+  background: #ffffff;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04);
+  overflow: visible;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Accent stripe on the left edge identifies the node type at a glance. */
+.react-flow__node [class*="-node-card"]::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--node-accent);
+  pointer-events: none;
+}
+
+.react-flow__node [class*="-node-card"]:hover {
+  transform: none;
+  border-color: #cbd5e1;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.react-flow__node [class*="-node-card"].selected {
+  border-color: var(--node-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--node-accent) 18%, transparent),
+    0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.react-flow__node [class*="-node-card"] {
+  position: relative;
+}
+
+.react-flow__node .start-node-card,
+.react-flow__node .stop-node-card {
+  width: 160px;
+}
+
+.react-flow__node [class*="-node-card"] > .node-card-header {
+  background: transparent;
+  padding: 10px 10px 6px 14px;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+}
+
+.react-flow__node [class*="-node-card"] .node-card-title-row {
+  gap: 8px;
+  min-width: 0;
+}
+
+.react-flow__node [class*="-node-card"] .node-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: var(--node-accent-soft);
+  color: var(--node-accent);
+}
+
+.react-flow__node [class*="-node-card"] .node-icon svg {
+  width: 11px;
+  height: 11px;
+}
+
+.react-flow__node [class*="-node-card"] .node-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  max-width: 170px;
+}
+
+/* Delete control appears only on hover / selection to keep cards calm. */
+.react-flow__node [class*="-node-card"] .node-delete-btn {
+  opacity: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1;
+  color: #64748b;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.react-flow__node:hover [class*="-node-card"] .node-delete-btn,
+.react-flow__node [class*="-node-card"].selected .node-delete-btn,
+.react-flow__node [class*="-node-card"] .node-delete-btn:focus-visible {
+  opacity: 1;
+}
+
+.react-flow__node [class*="-node-card"] .node-delete-btn:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.react-flow__node [class*="-node-card"] > .node-card-body {
+  background: transparent;
+  padding: 2px 12px 10px 14px;
+}
+
+.react-flow__node [class*="-node-card"] .chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 5px;
+  letter-spacing: 0.03em;
+  align-self: flex-start;
+}
+
+.react-flow__node [class*="-node-card"] .model-chip {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.react-flow__node [class*="-node-card"] .node-meta-row {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.react-flow__node [class*="-node-card"] .node-meta-row strong {
+  color: #334155;
+  font-weight: 600;
+}
+
+.react-flow__node [class*="-node-card"] .tool-node-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.react-flow__node [class*="-node-card"] > .node-card-footer {
+  background: transparent;
+  border-top: 1px solid #f1f5f9;
+  padding: 6px 12px 7px 14px;
+  text-align: left;
+  font-size: 11px;
+  color: #64748b;
+  border-radius: 0 0 12px 12px;
+}
+
+.react-flow__node [class*="-node-card"].selected > .node-card-footer {
+  color: var(--node-accent);
+}
+
+/* ── Handles ─────────────────────────────────────────────────────────────── */
+
+.react-flow__node .flow-handle {
+  width: 8px !important;
+  height: 8px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: none !important;
+}
+
+.react-flow__node:hover .flow-handle,
+.react-flow__node.selected .flow-handle {
+  border-color: #6366f1 !important;
+}
+
+.react-flow__node .flow-handle:hover,
+.react-flow__node .flow-handle.connectingto,
+.react-flow__node .flow-handle.valid {
+  transform: scale(1.3) !important;
+  background: #6366f1 !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18) !important;
+}
+
+/* ── Per-type accents ────────────────────────────────────────────────────── */
+
+.react-flow__node .start-node-card { --node-accent: #059669; --node-accent-soft: #ecfdf5; }
+.react-flow__node .stop-node-card { --node-accent: #dc2626; --node-accent-soft: #fef2f2; }
+.react-flow__node .llm-node-card { --node-accent: #2563eb; --node-accent-soft: #eff6ff; }
+.react-flow__node .tool-node-card { --node-accent: #0891b2; --node-accent-soft: #ecfeff; }
+.react-flow__node .tool-node-card.mcp { --node-accent: #7c3aed; --node-accent-soft: #f5f3ff; }
+.react-flow__node .toolkit-node-card { --node-accent: #9333ea; --node-accent-soft: #faf5ff; }
+.react-flow__node .master-agent-node-card,
+.react-flow__node .child-agent-node-card { --node-accent: #4f46e5; --node-accent-soft: #eef2ff; }
+.react-flow__node .memory-node-card { --node-accent: #db2777; --node-accent-soft: #fdf2f8; }
+.react-flow__node .cache-node-card { --node-accent: #d97706; --node-accent-soft: #fffbeb; }
+.react-flow__node .doc-loader-node-card,
+.react-flow__node .text-splitter-node-card,
+.react-flow__node .embedding-node-card,
+.react-flow__node .vector-store-node-card,
+.react-flow__node .retriever-node-card,
+.react-flow__node .reranker-node-card { --node-accent: #0d9488; --node-accent-soft: #f0fdfa; }
+.react-flow__node .middleware-node-card,
+.react-flow__node .gateway-node-card { --node-accent: #e11d48; --node-accent-soft: #fff1f2; }
+.react-flow__node .human-gate-node-card { --node-accent: #ea580c; --node-accent-soft: #fff7ed; }
+.react-flow__node .checkpointer-node-card { --node-accent: #4f46e5; --node-accent-soft: #eef2ff; }
+.react-flow__node .output-parser-node-card,
+.react-flow__node .wf-step-node-card { --node-accent: #475569; --node-accent-soft: #f1f5f9; }
+
+.flow-surface .react-flow__controls-button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+/* Editor debugging (plan.md F6): ● breakpoint / 📌 pin buttons in a node's header, beside ✕.
+   Set ones always show (so a glance at the canvas tells which nodes pause or are pinned); unset ones
+   appear on hover or selection, like ✕. */
+.react-flow__node .node-debug-badges { display: inline-flex; align-items: center; gap: 2px; margin-left: auto; margin-right: 2px; }
+.node-debug-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 11px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+.node-debug-badge:hover:not(:disabled) { background: #f1f5f9; }
+.node-debug-badge:disabled { cursor: default; }
+.node-debug-badge--break { font-size: 14px; }
+.node-debug-badge--pin { filter: grayscale(1); }
+.react-flow__node:hover .node-debug-badge,
+.react-flow__node [class*="-node-card"].selected .node-debug-badge,
+.node-debug-badge:focus-visible,
+.node-debug-badge--on { opacity: 1; }
+.node-debug-badge--break.node-debug-badge--on { color: #dc2626; background: #fef2f2; border-color: #fecaca; }
+.node-debug-badge--pin.node-debug-badge--on { filter: none; background: #eef2ff; border-color: #c7d2fe; }
+
+/* Skill node: are its tools on the LLM node it's wired to? (utils/skillReadiness.ts) */
+.skill-readiness {
+  margin: 6px 0 0;
+  font-size: 10px;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.skill-readiness--ok { color: #047857; }
+.skill-readiness--bad { color: #b45309; }

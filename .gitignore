@@ -1,0 +1,53 @@
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# --- Secrets / env ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+!**/cacert.pem
+.secrets_master_key
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Local databases / runtime data ---
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Build outputs (PyInstaller, Vite, Tauri) ---
+backend/build/
+backend/dist/
+dist/
+build/
+desktop/src-tauri/target/
+
+# --- Node ---
+node_modules/
+
+# --- Local / private notes (not for the repo) ---
+to_be_deleted/
+patent_plan.md

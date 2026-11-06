@@ -1,0 +1,30 @@
+{
+  "provider": "anthropic",
+  "_about": "Model prices for the LLM gateway (llm/pricing.py), keyed by the model name set on the LLM node. Override or add locally in <data dir>/prices/<provider>.json.",
+  "unit": "USD per 1M tokens",
+  "source": "LiteLLM 1.103.2 model_cost via scripts/seed_prices.py, 2026-10-28",
+  "models": {
+    "claude-fable-5": {"in": 10.0, "out": 50.0, "cache_read": 1.0, "cache_write": 12.5},
+    "claude-fable-5-1": {"in": 10.0, "out": 50.0, "cache_read": 0.25, "cache_write": 12.5},
+    "claude-haiku-4-5": {"in": 1.0, "out": 5.0, "cache_read": 0.1, "cache_write": 1.25},
+    "claude-haiku-4-5-20251001": {"in": 1.0, "out": 5.0, "cache_read": 0.1, "cache_write": 1.25},
+    "claude-haiku-5-5": {"in": 0.1, "out": 0.5, "cache_read": 0.01, "cache_write": 0.125, "tiers": [{"above": 100000, "in": 0.5, "out": 2.5, "cache_write": 0.625, "cache_read": 0.05}]},
+    "claude-mythos-5": {"in": 10.0, "out": 50.0, "cache_read": 1.0, "cache_write": 12.5},
+    "claude-mythos-5-1": {"in": 10.0, "out": 50.0, "cache_read": 0.25, "cache_write": 12.5},
+    "claude-mythos-preview": {"in": 10.0, "out": 50.0, "cache_read": 1.0, "cache_write": 12.5},
+    "claude-opus-4-5": {"in": 5.0, "out": 25.0, "cache_read": 0.5, "cache_write": 6.25},
+    "claude-opus-4-5-20251101": {"in": 5.0, "out": 25.0, "cache_read": 0.5, "cache_write": 6.25},
+    "claude-opus-4-6": {"in": 5.0, "out": 25.0, "cache_read": 0.5, "cache_write": 6.25},
+    "claude-opus-4-6-20260205": {"in": 5.0, "out": 25.0, "cache_read": 0.5, "cache_write": 6.25},
+    "claude-opus-4-7": {"in": 5.0, "out": 25.0, "cache_read": 0.5, "cache_write": 6.25},
+    "claude-opus-4-7-20260416": {"in": 5.0, "out": 25.0, "cache_read": 0.5, "cache_write": 6.25},
+    "claude-opus-4-8": {"in": 5.0, "out": 25.0, "cache_read": 0.5, "cache_write": 6.25},
+    "claude-opus-5": {"in": 5.0, "out": 25.0, "cache_read": 0.5, "cache_write": 6.25},
+    "claude-opus-5-5": {"in": 4.0, "out": 20.0, "cache_read": 0.2, "cache_write": 5.0},
+    "claude-sonnet-4-5": {"in": 3.0, "out": 15.0, "cache_read": 0.3, "cache_write": 3.75},
+    "claude-sonnet-4-5-20250929": {"in": 3.0, "out": 15.0, "cache_read": 0.3, "cache_write": 3.75},
+    "claude-sonnet-4-6": {"in": 3.0, "out": 15.0, "cache_read": 0.3, "cache_write": 3.75},
+    "claude-sonnet-5": {"in": 2.0, "out": 10.0, "cache_read": 0.2, "cache_write": 2.5},
+    "claude-sonnet-5-5": {"in": 2.0, "out": 10.0, "cache_read": 0.1, "cache_write": 2.5}
+  }
+}

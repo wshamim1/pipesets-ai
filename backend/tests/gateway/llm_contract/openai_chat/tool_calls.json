@@ -1,0 +1,236 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "Two parallel tool calls, arguments split across chunks",
+  "providers": {
+    "openai": "gpt-4o-mini",
+    "jan": "llama3.2-3b",
+    "llamacpp": "gemma-3-1b",
+    "ollama": "qwen3:4b"
+  },
+  "modes": [
+    "stream"
+  ],
+  "request": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "Weather and time in Paris?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_weather",
+          "description": "Weather for a city",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "city"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_time",
+          "description": "Local time for a city",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "city"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "auto"
+  },
+  "responses": {
+    "stream": {
+      "status": 200,
+      "events": [
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [
+            {
+              "index": 0,
+              "delta": {
+                "role": "assistant",
+                "content": null,
+                "tool_calls": [
+                  {
+                    "index": 0,
+                    "function": {
+                      "arguments": "",
+                      "name": "get_weather"
+                    },
+                    "id": "call_a",
+                    "type": "function"
+                  }
+                ]
+              },
+              "finish_reason": null
+            }
+          ]
+        },
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [
+            {
+              "index": 0,
+              "delta": {
+                "tool_calls": [
+                  {
+                    "index": 0,
+                    "function": {
+                      "arguments": "{\"ci"
+                    }
+                  }
+                ]
+              },
+              "finish_reason": null
+            }
+          ]
+        },
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [
+            {
+              "index": 0,
+              "delta": {
+                "tool_calls": [
+                  {
+                    "index": 0,
+                    "function": {
+                      "arguments": "ty\": \"Paris\"}"
+                    }
+                  }
+                ]
+              },
+              "finish_reason": null
+            }
+          ]
+        },
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [
+            {
+              "index": 0,
+              "delta": {
+                "tool_calls": [
+                  {
+                    "index": 1,
+                    "function": {
+                      "arguments": "",
+                      "name": "get_time"
+                    },
+                    "id": "call_b",
+                    "type": "function"
+                  }
+                ]
+              },
+              "finish_reason": null
+            }
+          ]
+        },
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [
+            {
+              "index": 0,
+              "delta": {
+                "tool_calls": [
+                  {
+                    "index": 1,
+                    "function": {
+                      "arguments": "{\"city\": \"Paris\"}"
+                    }
+                  }
+                ]
+              },
+              "finish_reason": null
+            }
+          ]
+        },
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [
+            {
+              "index": 0,
+              "delta": {},
+              "finish_reason": "tool_calls"
+            }
+          ]
+        },
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [],
+          "usage": {
+            "prompt_tokens": 80,
+            "completion_tokens": 30,
+            "total_tokens": 110
+          }
+        },
+        "[DONE]"
+      ]
+    }
+  },
+  "expect": {
+    "text": "",
+    "finish_reason": "tool_calls",
+    "tool_calls": [
+      {
+        "id": "call_a",
+        "name": "get_weather",
+        "arguments": {
+          "city": "Paris"
+        }
+      },
+      {
+        "id": "call_b",
+        "name": "get_time",
+        "arguments": {
+          "city": "Paris"
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 80,
+      "completion_tokens": 30,
+      "total_tokens": 110
+    }
+  }
+}

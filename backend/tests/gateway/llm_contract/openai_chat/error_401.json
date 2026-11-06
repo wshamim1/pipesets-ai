@@ -1,0 +1,50 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "HTTP 401 before any output",
+  "providers": {
+    "openai": "gpt-4o-mini"
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be brief."
+      },
+      {
+        "role": "user",
+        "content": "Say hello."
+      }
+    ]
+  },
+  "responses": {
+    "stream": {
+      "status": 401,
+      "body": {
+        "error": {
+          "message": "Incorrect API key provided: sk-contr****0000.",
+          "type": "invalid_request_error",
+          "param": null,
+          "code": null
+        }
+      }
+    },
+    "complete": {
+      "status": 401,
+      "body": {
+        "error": {
+          "message": "Incorrect API key provided: sk-contr****0000.",
+          "type": "invalid_request_error",
+          "param": null,
+          "code": null
+        }
+      }
+    }
+  },
+  "expect": {
+    "error": {
+      "status": 401,
+      "retryable": false,
+      "message_contains": "Incorrect API key provided"
+    }
+  }
+}

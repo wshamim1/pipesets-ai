@@ -1,0 +1,72 @@
+# Who may connect to what inside the namespace (needs a CNI that enforces NetworkPolicy).
+#
+#   ingress controller → frontend:8080   the UI host
+#   ingress controller → backend:8000    the public host — the Ingress only routes /v1/* there
+#   frontend           → backend:8000    the UI's /api proxy
+#   backend            → sandbox:8090    (sandbox.yaml)
+#
+# Everything else is refused, so no other pod in the cluster can reach /api directly.
+# Egress stays open: the backend calls LLM providers, tools and the database.
+# The controller is matched by its namespace name; change it if yours isn't ingress-nginx.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: pipesets-ai
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-from-ingress
+  namespace: pipesets-ai
+spec:
+  podSelector:
+    matchLabels: {app: frontend}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: ingress-nginx}
+      ports:
+        - {protocol: TCP, port: 8080}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-from-frontend-and-ingress
+  namespace: pipesets-ai
+spec:
+  podSelector:
+    matchLabels: {app: backend}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: {app: frontend}
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: ingress-nginx}
+      ports:
+        - {protocol: TCP, port: 8000}
+---
+# Prometheus scraping /metrics (backend:8000, worker:9100). Uncomment and set the namespace your
+# Prometheus runs in; without it default-deny-ingress blocks the scrape.
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: metrics-from-monitoring
+#   namespace: pipesets-ai
+# spec:
+#   podSelector:
+#     matchExpressions:
+#       - {key: app, operator: In, values: [backend, worker]}
+#   policyTypes: [Ingress]
+#   ingress:
+#     - from:
+#         - namespaceSelector:
+#             matchLabels: {kubernetes.io/metadata.name: monitoring}
+#       ports:
+#         - {protocol: TCP, port: 8000}
+#         - {protocol: TCP, port: 9100}

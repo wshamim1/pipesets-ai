@@ -1,0 +1,108 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "Prompt cache hit: cached tokens are part of prompt_tokens and priced at the cache-read rate",
+  "providers": {
+    "openai": "gpt-4o-mini"
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be brief."
+      },
+      {
+        "role": "user",
+        "content": "Say hello."
+      }
+    ]
+  },
+  "responses": {
+    "stream": {
+      "status": 200,
+      "events": [
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [
+            {
+              "index": 0,
+              "delta": {
+                "role": "assistant",
+                "content": "Hi."
+              },
+              "finish_reason": null
+            }
+          ]
+        },
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [
+            {
+              "index": 0,
+              "delta": {},
+              "finish_reason": "stop"
+            }
+          ]
+        },
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [],
+          "usage": {
+            "prompt_tokens": 2048,
+            "completion_tokens": 10,
+            "total_tokens": 2058,
+            "prompt_tokens_details": {
+              "cached_tokens": 1792
+            }
+          }
+        },
+        "[DONE]"
+      ]
+    },
+    "complete": {
+      "status": 200,
+      "body": {
+        "id": "chatcmpl-1",
+        "object": "chat.completion",
+        "created": 1761700000,
+        "model": "gpt-4o-mini",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Hi."
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 2048,
+          "completion_tokens": 10,
+          "total_tokens": 2058,
+          "prompt_tokens_details": {
+            "cached_tokens": 1792
+          }
+        }
+      }
+    }
+  },
+  "expect": {
+    "text": "Hi.",
+    "finish_reason": "stop",
+    "usage": {
+      "prompt_tokens": 2048,
+      "completion_tokens": 10,
+      "total_tokens": 2058,
+      "cache_read_tokens": 1792
+    }
+  }
+}

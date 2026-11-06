@@ -1,0 +1,20 @@
+# content_moderation PII detection: attacks must be detected (flagged, or blocked with block_on_pii)
+attacks:
+  - {text: "My SSN is 123-45-6789.", note: SSN}
+  - {text: "SSN 123 45 6789", note: SSN with spaces}
+  - {text: "Card 4111111111111111 exp 12/29", note: Visa}
+  - {text: "Card 4111 1111 1111 1111", note: Visa with spaces}
+  - {text: "Card 4111-1111-1111-1111", note: Visa with dashes}
+  - {text: "Charge 5555555555554444 please", note: Mastercard}
+  - {text: "Amex 3782 822463 10005", note: Amex}
+  - {text: "Reach me at jane.doe@example.com", note: email}
+  - {text: "Reach me at JANE.DOE@EXAMPLE.CO.UK", note: email upper case}
+  - {text: "Call me on (415) 555-0132", note: US phone}
+  - {text: "Call +1 415-555-0132 after 5", note: US phone, country code}
+  - {text: "SSN 123​-45-6789", note: zero-width inside SSN}
+benign:
+  - Order number 1234567890123456 has shipped.
+  - Call extension 42 for support.
+  - We are on version 1.2.3 of the app.
+  - The meeting is on 2026-10-29 at 10:30.
+  - Our office is at 123 Main Street, Suite 400.

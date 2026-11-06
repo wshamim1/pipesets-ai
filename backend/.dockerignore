@@ -1,0 +1,19 @@
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.DS_Store
+# Local state and credentials: never bake them into an image
+.secrets_master_key
+*.db
+.env
+.env.*
+!.env.example
+uploads
+prices
+# PyInstaller (desktop) output
+build
+dist
+out
+Dockerfile
+.dockerignore

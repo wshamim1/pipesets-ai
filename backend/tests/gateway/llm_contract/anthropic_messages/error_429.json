@@ -1,0 +1,49 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "HTTP 429 before any output",
+  "providers": {
+    "anthropic": "claude-haiku-5-5"
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be brief."
+      },
+      {
+        "role": "user",
+        "content": "Say hello."
+      }
+    ],
+    "max_tokens": 64
+  },
+  "responses": {
+    "stream": {
+      "status": 429,
+      "body": {
+        "type": "error",
+        "error": {
+          "type": "rate_limit_error",
+          "message": "Number of request tokens has exceeded your per-minute rate limit"
+        }
+      }
+    },
+    "complete": {
+      "status": 429,
+      "body": {
+        "type": "error",
+        "error": {
+          "type": "rate_limit_error",
+          "message": "Number of request tokens has exceeded your per-minute rate limit"
+        }
+      }
+    }
+  },
+  "expect": {
+    "error": {
+      "status": 429,
+      "retryable": true,
+      "message_contains": "Number of request tokens has e"
+    }
+  }
+}

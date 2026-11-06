@@ -1,0 +1,3 @@
+# Build-only: packages the backend into a single folder for the desktop app (see pipesets-backend.spec).
+# Install with: .venv/bin/python -m pip install -r requirements-build.txt
+pyinstaller==6.22.3
