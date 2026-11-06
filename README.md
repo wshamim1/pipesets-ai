@@ -1,5 +1,17 @@
 # Pipesets AI
 
+**Build, test and ship LLM agent pipelines in one self-hosted platform.**
+
+[![Version](https://img.shields.io/badge/version-0.7.0-6366f1)](#)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.12%2B-3776ab)](#prerequisites)
+[![Node](https://img.shields.io/badge/node-20.19%2B-339933)](#prerequisites)
+[![Tested on](https://img.shields.io/badge/tested%20on-macOS-lightgrey)](#known-limitations)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
+
+[Quickstart](#quickstart) · [Features](#features) · [Architecture](docs/architecture/README.md) ·
+[User guide](docs/guide/README.md) · [Contributing](#contributing)
+
 Pipesets AI is a self-hostable platform for building, evaluating and operating LLM agent
 pipelines. You design a pipeline visually on a canvas (models, tools, memory, retrieval,
 guardrails, multi-agent orchestration), test it against eval datasets, publish a version, and run
@@ -17,10 +29,37 @@ Version **0.7.0**. The core platform is feature-complete for a pilot. See
 > expected to run on Linux (the container images are Linux), but it has not been tested on
 > **Windows** yet. Reports and fixes for other platforms are welcome.
 
+## Quickstart
+
+```bash
+git clone https://github.com/wshamim1/pipesets-ai.git && cd pipesets-ai
+cp backend/.env.example backend/.env   # add a provider key, or set DEFAULT_LLM_PROVIDER=mock
+./start.sh                             # UI on http://localhost:5173, API on :8000
+```
+
+The first start creates the database and a demo workspace with sample data. See
+[Getting started](#getting-started) for the details, or [Deployment](#deployment) for containers.
+
+## Why Pipesets
+
+- **One place for the whole lifecycle:** build on a canvas, test with evals and in Lab, publish
+  behind a gate, run anywhere, and watch it in Monitor. No gluing a framework, a vector store, an
+  eval tool and a tracer together.
+- **Runs where you need it:** REST API, Python SDK and CLI, MCP server, cron schedules, webhooks,
+  shareable chat links, and pipelines that call other pipelines.
+- **No lock-in:** 19 model providers through its own gateway, local models (Ollama, llama.cpp),
+  and exports to LangChain, CrewAI, AutoGen, notebooks or Docker.
+- **Ready for teams:** multi-tenant access control, an encrypted secrets vault, guardrails,
+  budgets and an append-only audit log.
+- **Self-hosted your way:** one script locally, Docker or Podman Compose, Kubernetes, or a
+  desktop app.
+
 ---
 
 ## Contents
 
+- [Quickstart](#quickstart)
+- [Why Pipesets](#why-pipesets)
 - [At a glance](#at-a-glance)
 - [Core concepts](#core-concepts)
 - [Features](#features)
@@ -37,6 +76,7 @@ Version **0.7.0**. The core platform is feature-complete for a pilot. See
 - [Deployment](#deployment)
 - [Known limitations](#known-limitations)
 - [Further documentation](#further-documentation)
+- [Contributing](#contributing)
 - [License](#license)
 
 ---
@@ -665,10 +705,26 @@ docker compose up -d --build     # or: podman compose up -d --build
 | [sdk/README.md](sdk/README.md) | SDK, CLI and MCP server reference |
 | [docs/guide](docs/guide/README.md) | User guide: building pipelines, tools, MCP, custom tools, agents, workflows, skills, RAG, guardrails, evals, monitoring, automation, sharing, settings, document extraction. Also in the app: **Docs** in the top bar |
 
+## Contributing
+
+Pipesets AI started as a weekend project, and contributions of every size are welcome: bug
+reports, fixes, docs, and new building blocks. Most additions are one self-contained file:
+
+- **A tool:** one module in `backend/tools/`, registered automatically.
+- **A document loader:** one module in `backend/loaders/`. There are 93 planned loaders in
+  `_planned.py` waiting for someone to build them.
+- **An LLM provider:** an adapter in `backend/llm/backends/`, plus a contract test.
+- **Platform support:** testing on Linux or Windows, and fixes for what breaks there.
+
+Start with an issue labelled
+[good first issue](https://github.com/wshamim1/pipesets-ai/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22),
+and read [CONTRIBUTING.md](CONTRIBUTING.md) for setup and the checks CI runs. Tests never call a
+real LLM, so you don't need API keys. Report security issues as described in
+[SECURITY.md](SECURITY.md), not in public issues.
+
+If Pipesets is useful to you, **star the repo**. It helps other builders find it.
+
 ## License
 
 Apache License 2.0. Copyright 2026 Shamim and the Pipesets AI contributors. See
 [LICENSE](LICENSE) and [NOTICE](NOTICE).
-
-Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and report security issues as
-described in [SECURITY.md](SECURITY.md).
