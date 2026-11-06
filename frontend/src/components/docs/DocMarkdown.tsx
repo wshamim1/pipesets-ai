@@ -9,6 +9,7 @@
 import React from 'react'
 import { headingAnchors } from '../../utils/guides'
 import { classifyLink, docHref, tableCells } from '../../utils/docLinks'
+import { DocDiagram } from './DocDiagram'
 
 interface Ctx {
   anchors: string[]
@@ -88,7 +89,9 @@ function blocks(lines: string[], ctx: Ctx, key = 'b'): React.ReactNode[] {
         i++
       }
       i++
-      out.push(<pre key={k} className="doc-code" data-lang={lang || undefined}><code>{code.join('\n')}</code></pre>)
+      out.push(lang === 'mermaid'
+        ? <DocDiagram key={k} source={code.join('\n')} />
+        : <pre key={k} className="doc-code" data-lang={lang || undefined}><code>{code.join('\n')}</code></pre>)
       continue
     }
 

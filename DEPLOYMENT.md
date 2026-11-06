@@ -58,7 +58,7 @@ Podman without compose, using a pod:
 ```bash
 # from the repo root (pipesets-ai/)
 podman build -t pipesets-ai-backend  ./backend
-podman build -t pipesets-ai-frontend --build-context docs=./docs/guide ./frontend
+podman build -t pipesets-ai-frontend --build-context docs=./docs ./frontend
 podman pod create --name pipesets-ai -p 8080:8080 -p 8000:8000
 podman run -d --pod pipesets-ai --name backend  --env-file deploy/compose/.env -v pipesets-ai-data:/data pipesets-ai-backend
 podman run -d --pod pipesets-ai --name frontend -e BACKEND_URL=http://127.0.0.1:8000 pipesets-ai-frontend
@@ -66,8 +66,8 @@ podman run -d --pod pipesets-ai --name frontend -e BACKEND_URL=http://127.0.0.1:
 
 (Inside a pod, containers share localhost, hence `BACKEND_URL=http://127.0.0.1:8000`.)
 
-The frontend image bundles the user guide (`docs/guide/`, shown under **Docs** in the app), which is
-outside `frontend/`, so its build needs the extra build context `docs` as above (`--build-context`
+The frontend image bundles the user guide and the architecture pages (`docs/guide/` and
+`docs/architecture/`, shown under **Docs** in the app), which are outside `frontend/`, so its build needs the extra build context `docs` as above (`--build-context`
 needs BuildKit / Docker 23+ or Podman 4.2+; Compose passes it through `additional_contexts`). Without
 it the build stops at `COPY --from=docs`.
 
@@ -85,7 +85,7 @@ python backend/scripts/write_release_notes.py
 ```bash
 # 1. Build and make the images available to the cluster
 docker build -t registry.example.com/pipesets-ai-backend:0.7.0  backend
-docker build -t registry.example.com/pipesets-ai-frontend:0.7.0 --build-context docs=docs/guide frontend
+docker build -t registry.example.com/pipesets-ai-frontend:0.7.0 --build-context docs=docs frontend
 docker push registry.example.com/pipesets-ai-backend:0.7.0
 docker push registry.example.com/pipesets-ai-frontend:0.7.0
 #    then uncomment/edit the `images:` block in deploy/k8s/kustomization.yaml

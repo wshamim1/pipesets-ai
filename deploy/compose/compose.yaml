@@ -121,7 +121,7 @@ services:
     build:
       context: ../../frontend
       additional_contexts:
-        docs: ../../docs/guide   # the user guide bundled into Docs (frontend/Dockerfile)
+        docs: ../../docs   # the user guide and architecture pages bundled into Docs (frontend/Dockerfile)
     image: pipesets-ai-frontend:latest
     restart: unless-stopped
     environment:

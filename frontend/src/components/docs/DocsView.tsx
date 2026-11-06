@@ -5,10 +5,16 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { GUIDES, findGuide, headingAnchors, searchGuides } from '../../utils/guides'
-import type { Guide } from '../../utils/guides'
+import type { Guide, GuideSection } from '../../utils/guides'
 import { DocMarkdown } from './DocMarkdown'
 import { docHref } from '../../utils/docLinks'
 import '../../styles/docs.css'
+
+/** The sidebar's groups, in order; the user guide has no label of its own */
+const NAV_GROUPS: { section: GuideSection; label: string | null }[] = [
+  { section: 'guide', label: null },
+  { section: 'architecture', label: 'Architecture' },
+]
 
 interface Props {
   page: string | null
@@ -67,18 +73,27 @@ export function DocsView({ page, onPageChange, guides = GUIDES }: Props) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <ul>
-          {guides.map((g) => (
-            <li key={g.id}>
-              <a
-                href={docHref(g.id)}
-                className={g.id === guide.id && !query ? 'active' : undefined}
-                aria-current={g.id === guide.id ? 'page' : undefined}
-                onClick={(e) => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); navigate(g.id, '') }}
-              >{g.title}</a>
-            </li>
-          ))}
-        </ul>
+        {NAV_GROUPS.map(({ section, label }) => {
+          const items = guides.filter((g) => (g.section ?? 'guide') === section)
+          if (!items.length) return null
+          return (
+            <div key={section} className="docs-nav-group">
+              {label && <div className="docs-nav-label">{label}</div>}
+              <ul aria-label={label ?? 'User guide'}>
+                {items.map((g) => (
+                  <li key={g.id}>
+                    <a
+                      href={docHref(g.id)}
+                      className={g.id === guide.id && !query ? 'active' : undefined}
+                      aria-current={g.id === guide.id ? 'page' : undefined}
+                      onClick={(e) => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); navigate(g.id, '') }}
+                    >{g.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        })}
       </nav>
 
       <div className="docs-main" ref={articleRef}>

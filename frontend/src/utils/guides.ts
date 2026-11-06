@@ -1,14 +1,20 @@
 /**
- * The user guide shown in Docs: the Markdown files in the repo's docs/guide/, bundled at build time,
- * so the docs always match the version that's running. Docker builds get that folder as the extra
- * build context "docs" (frontend/Dockerfile).
+ * The docs shown in Docs: the Markdown files in the repo's docs/guide/ (the user guide) and
+ * docs/architecture/ (how the system is built), bundled at build time, so the docs always match the
+ * version that's running. Docker builds get the docs/ folder as the extra build context "docs"
+ * (frontend/Dockerfile).
  */
 
+export type GuideSection = 'guide' | 'architecture'
+
 export interface Guide {
-  /** File name without .md ("03-tools"); the overview (README.md) is "index" */
+  /** File name without .md ("03-tools"); the overview (README.md) is "index". Architecture pages
+   * are "architecture-<file>", and their overview is "architecture". */
   id: string
   title: string
   body: string
+  /** Which part of the docs it belongs to (default "guide") */
+  section?: GuideSection
 }
 
 export interface SearchHit {
@@ -19,6 +25,7 @@ export interface SearchHit {
 }
 
 const files = import.meta.glob('../../../docs/guide/*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
+const architectureFiles = import.meta.glob('../../../docs/architecture/*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
 
 /** GitHub-style heading anchor: "2. OCR for scanned pages" → "2-ocr-for-scanned-pages" */
 export function slugify(heading: string): string {
@@ -70,7 +77,31 @@ export function buildGuides(sources: Record<string, string>): Guide[] {
     .sort((a, b) => (a.id === 'index' ? -1 : b.id === 'index' ? 1 : a.id.localeCompare(b.id, undefined, { numeric: true })))
 }
 
-export const GUIDES: Guide[] = buildGuides(files)
+const architectureId = (file: string) => (file.toLowerCase() === 'readme' ? 'architecture' : `architecture-${file}`)
+
+/** Architecture pages link to each other as "backend.md" and to the user guide as "../guide/x.md",
+ * as they do on GitHub. Inside Docs every page id must be unique, so those links are rewritten to
+ * the ids used here ("architecture-backend.md", "x.md"). */
+export function rewriteArchitectureLinks(body: string): string {
+  return body.replace(/\]\((\.\.\/guide\/)?(?:\.\/)?([\w-]+)\.md(?=[#)])/g, (_m, toGuide: string | undefined, file: string) =>
+    `](${toGuide ? file : architectureId(file)}.md`)
+}
+
+/** The architecture pages, overview first, then in the order its index links to them. */
+export function buildArchitecture(sources: Record<string, string>): Guide[] {
+  const pages = Object.entries(sources).map(([path, body]) => {
+    const file = path.split('/').pop()!.replace(/\.md$/, '')
+    const id = architectureId(file)
+    const h1 = body.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? file
+    return { id, title: id === 'architecture' ? 'Architecture overview' : h1, body: rewriteArchitectureLinks(body), section: 'architecture' as const }
+  })
+  const overview = pages.find((p) => p.id === 'architecture')
+  const order = overview ? [...overview.body.matchAll(/\]\((architecture-[\w-]+)\.md/g)].map((m) => m[1]) : []
+  const rank = (id: string) => (id === 'architecture' ? -1 : order.includes(id) ? order.indexOf(id) : order.length)
+  return pages.sort((a, b) => rank(a.id) - rank(b.id) || a.id.localeCompare(b.id))
+}
+
+export const GUIDES: Guide[] = [...buildGuides(files), ...buildArchitecture(architectureFiles)]
 
 export function findGuide(id: string | null | undefined, guides: Guide[] = GUIDES): Guide | undefined {
   return guides.find((g) => g.id === id) ?? guides[0]
