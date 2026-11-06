@@ -63,7 +63,7 @@ image or venv keyed by a hash of the requirements), never into the backend's own
 
 | Stage | Where |
 |---|---|
-| Document loaders (100+ types) | [backend/loaders/](../../backend/loaders/): `files`, `web`, `storage`, `databases`, `research` |
+| Document loaders (22 built, about 90 more listed as "Soon") | [backend/loaders/](../../backend/loaders/): `files`, `web`, `storage`, `databases`, `research` |
 | Text splitters, embeddings | `routers/retrieval.py` |
 | Vector stores | `services/vector_store.py` |
 | Retrievers and rerankers | `routers/retrieval.py`, used by `llm_runner` |
