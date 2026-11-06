@@ -81,6 +81,10 @@ class AppUpdateRequest(BaseModel):
     flow_data: Optional[Dict[str, Any]] = None
 
 
+class AppRenameRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+
+
 class AppDocsUpdateRequest(BaseModel):
     docs: str = Field(default="", max_length=100_000)
 

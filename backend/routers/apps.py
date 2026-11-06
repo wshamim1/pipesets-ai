@@ -9,7 +9,9 @@ from pydantic import BaseModel, Field
 
 import llm
 from db import get_db_connection, upsert
-from models import AppCreateRequest, AppDocsGenerateRequest, AppDocsUpdateRequest, AppUpdateRequest, AppResponse
+from models import (
+    AppCreateRequest, AppDocsGenerateRequest, AppDocsUpdateRequest, AppRenameRequest, AppUpdateRequest, AppResponse,
+)
 from services import pipeline_docs, publish_gate, secret_store
 from services.acl import require_access
 from services.flow_summary import pick_generator_llm
@@ -289,6 +291,31 @@ def update_app_docs(app_id: str, req: AppDocsUpdateRequest, request: Request):
     cursor.execute(
         "UPDATE apps SET docs = ?, updated_at = ? WHERE id = ? AND tenant_id = ? AND project_id = ?",
         (req.docs, datetime.utcnow().isoformat(), app_id, ctx.tenant_id, ctx.project_id),
+    )
+    if cursor.rowcount == 0:
+        conn.close()
+        raise HTTPException(status_code=404, detail="App not found")
+    conn.commit()
+    cursor.execute("SELECT * FROM apps WHERE id = ? AND tenant_id = ? AND project_id = ?", (app_id, ctx.tenant_id, ctx.project_id))
+    row = cursor.fetchone()
+    conn.close()
+    return _row_to_response(row)
+
+
+@router.put("/{app_id}/rename", response_model=AppResponse)
+def rename_app(app_id: str, req: AppRenameRequest, request: Request):
+    """Rename a pipeline. The name doesn't change how it runs (callers use its id), so unlike
+    PUT /{app_id} this works on published apps too; published versions keep their snapshot."""
+    ctx = get_request_context(request)
+    require_access(ctx, "apps", "write")
+    name = req.name.strip()
+    if not name:
+        raise HTTPException(status_code=422, detail="Name can't be empty")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE apps SET name = ?, updated_at = ? WHERE id = ? AND tenant_id = ? AND project_id = ?",
+        (name, datetime.utcnow().isoformat(), app_id, ctx.tenant_id, ctx.project_id),
     )
     if cursor.rowcount == 0:
         conn.close()
