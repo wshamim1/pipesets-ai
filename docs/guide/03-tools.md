@@ -28,7 +28,7 @@ text input. The model sees them as a function signature, which makes calls more 
 
 ## Install more tools
 
-There are about 145 built-in tools. To keep the sidebar short, only the ones your workspace has
+There are about 200 built-in tools and 110 MCP servers. To keep the sidebar short, only the ones your workspace has
 **installed** appear there; the rest wait in the package manager.
 
 1. Open **Settings → Tools & MCP packages**, or click **📦 Browse N more tools** at the bottom of

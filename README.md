@@ -13,10 +13,15 @@ from any MCP client, or share it as a chat link anyone can open on a phone or la
 Version **0.7.0**. The core platform is feature-complete for a pilot. See
 [Known limitations](#known-limitations) before running it with production data.
 
+> **Platform support:** Pipesets AI has been developed and tested on **macOS** only. It is
+> expected to run on Linux (the container images are Linux), but it has not been tested on
+> **Windows** yet. Reports and fixes for other platforms are welcome.
+
 ---
 
 ## Contents
 
+- [At a glance](#at-a-glance)
 - [Core concepts](#core-concepts)
 - [Features](#features)
 - [Canvas node reference](#canvas-node-reference)
@@ -35,6 +40,38 @@ Version **0.7.0**. The core platform is feature-complete for a pilot. See
 - [License](#license)
 
 ---
+
+## At a glance
+
+| | |
+|---|---|
+| LLM providers / models | 19 / 73 |
+| Built-in tools | 209 |
+| Built-in MCP servers | 110 |
+| Document loaders | 22 built, 93 planned |
+| Canvas node types | 25 |
+| Automated tests | 1,807 backend (pytest) and 303 frontend (Vitest) |
+
+Counted from the code for version 0.7.0: the tool and MCP registries, the loader registry, the
+model catalog, `frontend/src/nodes/` and the test suites.
+
+```mermaid
+%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#6366f1"}}}}%%
+xychart-beta horizontal
+    title "Built-in tools by category (209)"
+    x-axis ["Data & Files", "APIs & Integrations", "Research & Knowledge", "Communication", "Business Apps", "Code & Compute", "Productivity", "Everyday Utilities", "Web Search", "Frameworks", "DevOps & Observability", "Jobs & Careers"]
+    y-axis "Tools" 0 --> 60
+    bar [57, 42, 18, 17, 14, 12, 12, 11, 8, 8, 6, 4]
+```
+
+```mermaid
+%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#6366f1"}}}}%%
+xychart-beta horizontal
+    title "Built-in MCP servers by category (110)"
+    x-axis ["Databases & Data", "Developer Tools", "Web & Browser", "Productivity", "DevOps & Observability", "AI & Memory"]
+    y-axis "MCP servers" 0 --> 35
+    bar [30, 21, 20, 17, 12, 10]
+```
 
 ## Core concepts
 
@@ -65,8 +102,8 @@ The UI has seven areas: **Apps, Build, Evaluate, Monitor, Automation, Marketplac
 - AI-assisted building: generate a pipeline from a plain-language description, write custom
   Python tools from a prompt, or convert existing LangChain / CrewAI / AutoGen code into a
   blueprint.
-- Tools: a built-in catalog of about 145 tools (web search, Python, REST, SQL, GitHub, Slack, Notion,
-  Linear, Kafka and more) and 74 MCP servers, plus custom Python tools, custom MCP servers, toolkits
+- Tools: a built-in catalog of about 200 tools (web search, Python, REST, SQL, GitHub, Slack, Notion,
+  Linear, Kafka and more) and 110 MCP servers, plus custom Python tools, custom MCP servers, toolkits
   and skills.
 - **Tools & MCP packages** (Settings): the sidebar offers only the tools and MCP servers a workspace
   has installed — a starter set plus whatever its pipelines use. Browse and install the rest from
@@ -81,7 +118,8 @@ The UI has seven areas: **Apps, Build, Evaluate, Monitor, Automation, Marketplac
   deploy them from code with `pipesets tool` and a CI recipe (see [sdk/README.md](sdk/README.md)).
 - Custom Python code runs in a container sandbox (podman or docker). There is a local fallback
   that can be disabled.
-- RAG: over 100 document loader types, six text splitters, nine embedding providers, local or
+- RAG: 22 document loaders (PDF, Office, web, S3, databases and more; about 90 more are listed as
+  "Soon"), six text splitters, nine embedding providers, local or
   pgvector vector stores, similarity / MMR / BM25 retrievers, a reranker, and knowledge bases.
 - Guardrail middleware: content moderation with PII detection, prompt-injection detection,
   per-run token caps and rate limiting. Applied to normal and streaming runs, including mid-stream
@@ -190,25 +228,43 @@ For how each part works inside, see [docs/architecture](docs/architecture/README
 ```
 pipesets-ai/
 ├── backend/
-│   ├── main.py              FastAPI app: router registration, auth dependency, scheduler lifecycle
+│   ├── main.py              FastAPI app: middleware, router registration, background loops
 │   ├── routers/             one module per API area (apps, run, stream, v1, webhooks, eval, iam, …)
-│   ├── services/            pipeline runner, LLM runner, workflow engine, sandbox, scheduler,
-│   │                        webhooks, notifier, vector store, auth, API keys, ACLs, budgets
+│   ├── services/            pipeline runner, LLM runner, workflow engine, sandbox, job queue,
+│   │                        scheduler, secrets, auth, ACLs, audit log, budgets, vector store
+│   ├── llm/                 our own LLM gateway: backends, model catalog, pricing
+│   ├── tools/               built-in tools and MCP servers (one module each, auto-registered)
+│   ├── loaders/             document loaders (auto-registered; planned ones in _planned.py)
+│   ├── agents/              built-in agent packages
 │   ├── exporters/           LangChain, CrewAI, AutoGen, notebook, Docker and native exporters
-│   ├── data/                built-in tool catalog and custom-tool templates
+│   ├── data/                custom-tool templates
 │   ├── migrations/          Alembic migrations
-│   ├── tests/               pytest suite (conftest.py: per-module temp DB, helpers)
-│   ├── db.py · models.py    database engine, schema bootstrap, demo seed · default LLM config
-│   └── manage.py            admin CLI (API keys, passwords, schema)
+│   ├── tests/               pytest suite by area (conftest.py: per-module temp DB, helpers)
+│   ├── db.py · models.py    database access, schema bootstrap, demo seed · request/response models
+│   ├── sandbox_runner.py    remote sandbox service (deploy/k8s/sandbox.yaml)
+│   ├── desktop_main.py      backend entry point for the desktop app
+│   └── manage.py            admin CLI (schema, worker, API keys, passwords, secret rotation)
 ├── frontend/src/
 │   ├── App.tsx              top-level views and canvas
-│   ├── components/          views and panels (Build, Monitor, Eval, Marketplace, Lab, IAM, …)
+│   ├── components/          views and panels (Build, Monitor, Eval, Marketplace, Lab, Docs, …)
+│   ├── nodes/               one React Flow component per canvas node type
+│   ├── hooks/ · context/    app, flow, catalog, auth, tenant and credentials state
+│   ├── chat/                the public chat-link page (its own entry point)
 │   └── types.ts             node data types; API_BASE
+├── desktop/                 Tauri desktop app
 ├── sdk/                     `pipesets` Python SDK, CLI and MCP server
+├── docs/
+│   ├── guide/               user guide (also in the app under Docs)
+│   ├── architecture/        how the system is built (also in the app under Docs)
+│   └── media/               README tour
+├── examples/chat-embed/     embedding a chat link on a website
 ├── deploy/
 │   ├── compose/             Docker/Podman Compose
-│   └── k8s/                 Kustomize manifests
+│   ├── k8s/                 Kustomize manifests
+│   ├── edge/                nginx edge proxy with TLS
+│   └── grafana/             Grafana dashboard
 ├── start.sh · stop.sh       local development launcher
+├── start-desktop.sh         desktop app launcher
 └── DEPLOYMENT.md            container and Kubernetes deployment guide
 ```
 
@@ -216,6 +272,7 @@ pipesets-ai/
 
 ### Prerequisites
 
+- macOS (the only platform tested so far; Linux should work, Windows is untested)
 - Python 3.12+
 - Node.js 20.19+ or 22.12+ (required by Vite 8)
 - Optional: **podman or docker**. Used to sandbox custom Python tools and to run Lab service
@@ -576,9 +633,13 @@ docker compose up -d --build     # or: podman compose up -d --build
   webhook signing secrets and notification channel URLs. Pipelines can't be saved with a key typed
   into a node — pick it from Secrets. Logs mask known key patterns (`sk-…`, bearer tokens,
   `enc://…`). Restrict access to the database and its backups anyway.
-- **Single-process state:** the API-key rate limiter, webhook concurrency limits and scheduler
-  live in process memory. With several replicas, enable the scheduler on only one of them. Rate
-  limits apply per replica.
+- **Platform support:** developed and tested on macOS only. Linux is expected to work (the
+  container images are Linux) but isn't part of regular testing. Windows hasn't been tested: the
+  start scripts are Bash, and the desktop app has only been built for macOS.
+- **Several replicas:** schedules, jobs and Human Gate sweeps are coordinated through the database,
+  so each one runs once. Rate limits, login lockouts and cancel signals are shared only when
+  `PIPESETS_SHARED_STATE` is `database` or `redis`; with the default `memory`, each replica counts
+  on its own. Several replicas also need a shared database (PostgreSQL), not SQLite.
 - **Vector stores:** only `local` (brute-force cosine in the app DB, suitable for a few thousand
   chunks) and `pgvector` are implemented. Other store types shown in the UI fall back to `local`.
 - **Checkpointing:** Master Agent and LLM-node runs are checkpointed and resumable. Runs of a
