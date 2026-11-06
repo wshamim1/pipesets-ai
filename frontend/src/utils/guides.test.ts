@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { GUIDES, buildGuides, findGuide, headingAnchors, searchGuides, slugify } from './guides'
+import { GUIDES, buildArchitecture, buildGuides, findGuide, headingAnchors, rewriteArchitectureLinks, searchGuides, slugify } from './guides'
 import { classifyLink } from './docLinks'
 
 describe('the bundled user guide', () => {
@@ -61,5 +61,24 @@ describe('guides helpers', () => {
     expect(hits[1].snippet).toContain('Mentions webhooks once.')
     expect(searchGuides('webhooks pipeline', guides).map((h) => h.anchor)).toEqual(['webhooks'])
     expect(searchGuides(' ', guides)).toEqual([])
+  })
+})
+
+describe('the bundled architecture pages', () => {
+  it('come after the user guide, overview first, in the order the overview lists them', () => {
+    const arch = GUIDES.filter((g) => g.section === 'architecture')
+    expect(arch[0]).toMatchObject({ id: 'architecture', title: 'Architecture overview' })
+    expect(arch.map((g) => g.id)).toContain('architecture-security')
+    expect(arch.findIndex((g) => g.id === 'architecture-backend')).toBeLessThan(arch.findIndex((g) => g.id === 'architecture-deployment'))
+    expect(GUIDES.findIndex((g) => g.section === 'architecture')).toBeGreaterThan(GUIDES.findIndex((g) => g.id === '12-document-extraction'))
+    expect(findGuide('architecture-llm-gateway')?.title).toBe('LLM gateway')
+  })
+
+  it('rewrites links between pages to Docs ids, and leaves repository links alone', () => {
+    expect(rewriteArchitectureLinks('[a](backend.md) [b](security.md#audit-log) [c](README.md) [d](../guide/03-tools.md) [e](../guide/README.md) [f](../../DEPLOYMENT.md) [g](../../backend/main.py)'))
+      .toBe('[a](architecture-backend.md) [b](architecture-security.md#audit-log) [c](architecture.md) [d](03-tools.md) [e](README.md) [f](../../DEPLOYMENT.md) [g](../../backend/main.py)')
+    const pages = buildArchitecture({ '/x/README.md': '# Architecture\n\n[Two](two.md) [One](one.md)', '/x/one.md': '# One', '/x/two.md': '# Two' })
+    expect(pages.map((p) => p.id)).toEqual(['architecture', 'architecture-two', 'architecture-one'])
+    expect(classifyLink('architecture-two.md#x')).toEqual({ kind: 'guide', page: 'architecture-two', anchor: 'x' })
   })
 })

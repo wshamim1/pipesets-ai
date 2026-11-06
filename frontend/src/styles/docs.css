@@ -128,3 +128,11 @@
   .docs-nav { border-right: none; border-bottom: 1px solid #e2e8f0; max-height: 40vh; }
   .docs-main { padding: 20px 16px 60px; }
 }
+
+/* Sidebar groups (user guide, then Architecture) */
+.docs-nav-group + .docs-nav-group { margin-top: 16px; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+.docs-nav-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #94a3b8; padding: 0 8px 6px; }
+
+/* Mermaid diagrams (docs/architecture) */
+.doc-diagram { margin: 16px 0; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; overflow-x: auto; text-align: center; }
+.doc-diagram svg { max-width: 100%; height: auto; }

@@ -6,10 +6,12 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-# The user guide shown in Docs lives in the repo's docs/guide/, outside this build context. It comes in
-# as the extra build context "docs" (compose: additional_contexts; docker/podman build:
-# --build-context docs=docs/guide) and lands where src/utils/guides.ts imports it from.
-COPY --from=docs . /docs/guide/
+# The docs shown in Docs (the user guide in docs/guide/ and the architecture pages in
+# docs/architecture/) live in the repo's docs/ folder, outside this build context. It comes in as the
+# extra build context "docs" (compose: additional_contexts; docker/podman build:
+# --build-context docs=docs) and lands where src/utils/guides.ts imports it from.
+COPY --from=docs guide/ /docs/guide/
+COPY --from=docs architecture/ /docs/architecture/
 # The UI calls the API through the nginx reverse proxy at /api (same origin).
 ARG VITE_API_BASE=/api
 ENV VITE_API_BASE=${VITE_API_BASE}

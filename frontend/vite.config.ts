@@ -6,9 +6,10 @@ import { defineConfig } from 'vitest/config'
 
 const BACKEND = process.env.VITE_DEV_BACKEND || 'http://localhost:8000'
 
-// The user guide lives in the repo's docs/guide/ and is bundled into Docs (src/utils/guides.ts).
-// Docker builds get it as the extra build context "docs" (Dockerfile).
-const GUIDE_DIR = fileURLToPath(new URL('../docs/guide', import.meta.url))
+// The user guide (docs/guide/) and the architecture pages (docs/architecture/) live in the repo's
+// docs/ folder and are bundled into Docs (src/utils/guides.ts). Docker builds get that folder as the
+// extra build context "docs" (Dockerfile).
+const DOC_DIRS = ['../docs/guide', '../docs/architecture'].map((dir) => fileURLToPath(new URL(dir, import.meta.url)))
 
 // Public chat links (/c/<token>) open chat.html, its own small bundle, not the builder's index.html.
 // nginx does the same in production (nginx.conf.template, deploy/edge).
@@ -35,7 +36,7 @@ const FRONTEND_BUILD = {
   libraries: [
     ['React', 'react', 'UI framework'], ['React Flow', '@xyflow/react', 'Pipeline canvas'],
     ['Lucide', 'lucide-react', 'Icons'], ['Vite', 'vite', 'Build tool and dev server'],
-    ['TypeScript', 'typescript', 'Language'],
+    ['TypeScript', 'typescript', 'Language'], ['Mermaid', 'mermaid', 'Diagrams in Docs'],
   ].map(([name, pkg, role]) => ({ name, version: installed(pkg), role })).filter((l) => l.version),
 }
 
@@ -52,7 +53,7 @@ export default defineConfig({
     },
   },
   server: {
-    fs: { allow: [searchForWorkspaceRoot(process.cwd()), GUIDE_DIR] },
+    fs: { allow: [searchForWorkspaceRoot(process.cwd()), ...DOC_DIRS] },
     // Dev only: let an ngrok tunnel reach the dev server (e.g. to try the UI on a phone).
     // Opened through it, the UI calls the API on its own origin (src/types.ts), proxied here.
     allowedHosts: ['.ngrok-free.app', '.ngrok.app', '.ngrok.io'],
