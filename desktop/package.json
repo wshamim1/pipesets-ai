@@ -1,0 +1,16 @@
+{
+  "name": "pipesets-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "build:ui": "cd ../frontend && npx vite build --outDir ../desktop/dist --emptyOutDir && cd ../desktop && cp loading.html dist/",
+    "icon": "tauri icon icon-source.png -o src-tauri/icons",
+    "dev:packaged": "PIPESETS_BACKEND_BIN=\"$PWD/../backend/dist/pipesets-backend/pipesets-backend\" tauri dev",
+    "build:backend": "cd ../backend && .venv/bin/python -m PyInstaller pipesets-backend.spec --noconfirm"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4"
+  }
+}

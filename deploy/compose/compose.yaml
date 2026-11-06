@@ -1,0 +1,141 @@
+# Pipesets AI — container deployment
+#
+#   cd deploy/compose
+#   docker compose up -d --build        (or: podman compose up -d --build)
+#
+# UI:  http://localhost:${FRONTEND_PORT:-8080}      API docs: http://localhost:${BACKEND_PORT:-8000}/docs
+# Configuration is read from a `.env` file next to this file (see .env.example).
+#
+# Background jobs (scheduled / webhook runs, notifications) run inside the backend by default.
+# With PostgreSQL (DATABASE_URL), run them in their own container instead:
+#   PIPESETS_WORKER=external docker compose --profile worker up -d
+# Keep the default on SQLite: two processes writing one SQLite file contend for its lock.
+#
+# With more than one backend or worker, share rate limits, login lockouts and cancel signals:
+# PIPESETS_SHARED_STATE=database (no new service), or run Redis too:
+#   REDIS_URL=redis://redis:6379/0 docker compose --profile redis up -d
+
+x-backend-env: &backend-env
+  DATABASE_URL: ${DATABASE_URL:-}
+  DEFAULT_LLM_PROVIDER: ${DEFAULT_LLM_PROVIDER:-openai}
+  DEFAULT_LLM_MODEL: ${DEFAULT_LLM_MODEL:-gpt-4}
+  DEFAULT_LLM_TEMPERATURE: ${DEFAULT_LLM_TEMPERATURE:-0.7}
+  DEFAULT_LLM_MAX_TOKENS: ${DEFAULT_LLM_MAX_TOKENS:-1024}
+  DEFAULT_LLM_TOP_P: ${DEFAULT_LLM_TOP_P:-1.0}
+  PIPESETS_MASTER_KEY: ${PIPESETS_MASTER_KEY:-}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  LLM_BASE_URL: ${LLM_BASE_URL:-}
+  LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+  LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+  LANGFUSE_HOST: ${LANGFUSE_HOST:-https://cloud.langfuse.com}
+  LANGFUSE_REDACT: ${LANGFUSE_REDACT:-0}
+  # Python tools run in the sandbox runner below; nothing runs code inside the backend
+  SANDBOX_URL: http://sandbox:8090
+  SANDBOX_TOKEN: ${SANDBOX_TOKEN:?set SANDBOX_TOKEN in .env (see .env.example)}
+  SANDBOX_REQUIRE_ISOLATION: ${SANDBOX_REQUIRE_ISOLATION:-1}
+  EXTERNAL_AGENT_ALLOW_PRIVATE: ${EXTERNAL_AGENT_ALLOW_PRIVATE:-0}
+  EXTERNAL_AGENT_ALLOWED_HOSTS: ${EXTERNAL_AGENT_ALLOWED_HOSTS:-}
+  AUDIT_RETENTION_DAYS: ${AUDIT_RETENTION_DAYS:-365}
+  # memory (one process) | database | redis | auto (redis when REDIS_URL is set) — services/shared_state.py
+  PIPESETS_SHARED_STATE: ${PIPESETS_SHARED_STATE:-auto}
+  REDIS_URL: ${REDIS_URL:-}
+  # Traces over OTLP/HTTP (Tempo, Jaeger, Datadog, Honeycomb, …) when an endpoint is set; /metrics
+  # needs "Authorization: Bearer $METRICS_TOKEN" when that is set (services/telemetry.py)
+  OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+  OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_EXPORTER_OTLP_HEADERS:-}
+  OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-pipesets-ai}
+  OTEL_CAPTURE_CONTENT: ${OTEL_CAPTURE_CONTENT:-0}
+  METRICS_TOKEN: ${METRICS_TOKEN:-}
+
+services:
+  backend:
+    build:
+      context: ../../backend
+    image: pipesets-ai-backend:latest
+    restart: unless-stopped
+    environment:
+      <<: *backend-env
+      # embedded: this container also works the job queue; external: only the worker does
+      PIPESETS_WORKER: ${PIPESETS_WORKER:-embedded}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - backend-data:/data
+    networks: [default, sandbox]
+    depends_on:
+      - sandbox
+
+  # Works the job queue and takes turns at the periodic loops (scheduler tick, sweeps).
+  # Opt-in: --profile worker, with PIPESETS_WORKER=external for the backend. Scale with
+  # `--scale worker=N`; jobs and scheduled firings still run once each.
+  worker:
+    image: pipesets-ai-backend:latest
+    profiles: [worker]
+    restart: unless-stopped
+    command: ["sh", "-c", "mkdir -p /data/uploads && exec python manage.py worker"]
+    environment:
+      <<: *backend-env
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}
+      WORKER_METRICS_PORT: ${WORKER_METRICS_PORT:-9100}   # Prometheus: http://worker:9100/metrics
+    # The image's health check probes the API port, which the worker doesn't serve
+    healthcheck:
+      disable: true
+    stop_grace_period: 40s   # WORKER_GRACE_SECONDS (30) for running jobs, then exit
+    volumes:
+      - backend-data:/data
+    networks: [default, sandbox]
+    depends_on:
+      - backend   # builds the image and migrates the schema first
+      - sandbox
+
+  # Shared rate limits / lockouts / cancel signals for several replicas. Opt-in: --profile redis
+  # with REDIS_URL=redis://redis:6379/0. Holds nothing that must survive a restart.
+  redis:
+    image: redis:7-alpine
+    profiles: [redis]
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+
+  # Runs python_interpreter / custom tool code in throwaway containers with its own rootless
+  # podman. No published port: only the backend (sandbox network) can reach it.
+  sandbox:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile.sandbox
+    image: pipesets-ai-sandbox:latest
+    restart: unless-stopped
+    environment:
+      SANDBOX_TOKEN: ${SANDBOX_TOKEN:?set SANDBOX_TOKEN in .env (see .env.example)}
+    # What nested rootless podman needs; still not --privileged
+    devices:
+      - /dev/fuse
+    security_opt:
+      - label=disable
+      - seccomp=unconfined
+    volumes:
+      - sandbox-images:/home/podman/.local/share/containers
+    networks: [sandbox]
+
+  frontend:
+    build:
+      context: ../../frontend
+      additional_contexts:
+        docs: ../../docs/guide   # the user guide bundled into Docs (frontend/Dockerfile)
+    image: pipesets-ai-frontend:latest
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:8000
+    ports:
+      - "${FRONTEND_PORT:-8080}:8080"
+    depends_on:
+      - backend
+
+volumes:
+  backend-data:
+  sandbox-images:
+
+networks:
+  default:
+  # backend ↔ sandbox only (not internal: tools that call APIs and image pulls need egress)
+  sandbox:

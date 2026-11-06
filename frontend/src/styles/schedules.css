@@ -1,0 +1,432 @@
+/*
+ * schedules.css — Schedules panel (Build sidebar tab + Automation → Schedules).
+ * Reuses .ops-* toolbar chrome and .docs-btn buttons; everything here is .sched-*.
+ */
+
+.sched-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.sched-panel--compact {
+  padding: 12px 14px;
+  gap: 10px;
+}
+
+.sched-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sched-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.ops-panel .sched-body {
+  padding: 14px 16px;
+}
+
+.ops-panel .sched-card,
+.ops-panel .sched-form {
+  max-width: 880px;
+}
+
+.sched-muted {
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+.sched-note {
+  padding: 8px 10px;
+  border: 1px solid #e0e7ff;
+  border-radius: 8px;
+  background: #f8faff;
+  font-size: 12px;
+  color: #4338ca;
+}
+
+.sched-error {
+  padding: 8px 10px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fef2f2;
+  font-size: 12px;
+  color: #b91c1c;
+  overflow-wrap: anywhere;
+}
+
+.sched-error--inline {
+  padding: 5px 8px;
+  font-size: 11.5px;
+}
+
+.sched-empty {
+  padding: 18px 12px;
+  border: 1px dashed #e2e8f0;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 12.5px;
+  color: #64748b;
+}
+
+.sched-empty p { margin: 0 0 4px; }
+
+.sched-empty-title {
+  font-weight: 600;
+  color: #334155;
+}
+
+/* ── Form ─────────────────────────────────────────────────────────────────── */
+.sched-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #c7d2fe;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.sched-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sched-field > span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.sched-input {
+  height: 30px;
+  min-width: 0;
+  padding: 0 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #ffffff;
+  font: inherit;
+  font-size: 12.5px;
+  color: #0f172a;
+}
+
+.sched-input:focus,
+.sched-form .ops-select:focus {
+  outline: none;
+  border-color: #818cf8;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+.sched-input--num { width: 64px; }
+.sched-input--time { width: 110px; }
+
+.sched-input--mono {
+  flex: 1;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+.sched-textarea {
+  height: auto;
+  padding: 6px 8px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.sched-cadence {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.sched-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.sched-preview {
+  min-height: 16px;
+  font-size: 11.5px;
+  color: #475569;
+}
+
+.sched-preview--error { color: #b91c1c; }
+
+.sched-advanced summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.sched-advanced-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 8px 0 6px;
+}
+
+.sched-advanced p { margin: 0; }
+
+.sched-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* ── Schedule card ────────────────────────────────────────────────────────── */
+.sched-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #16a34a;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.sched-card--paused { border-left-color: #cbd5e1; }
+.sched-card--auto-paused { border-left-color: #f59e0b; }
+.sched-card--running { border-left-color: #4f46e5; }
+
+.sched-card-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sched-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sched-card-name {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sched-pill {
+  flex-shrink: 0;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.sched-pill--active { background: #dcfce7; color: #15803d; }
+.sched-pill--paused { background: #f1f5f9; color: #64748b; }
+.sched-pill--auto-paused { background: #fef3c7; color: #b45309; }
+.sched-pill--running { background: #e0e7ff; color: #4338ca; }
+
+.sched-card-cadence,
+.sched-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  font-size: 12px;
+  color: #334155;
+}
+
+.sched-card-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sched-cron {
+  padding: 0 5px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: #475569;
+}
+
+.sched-prompt {
+  overflow: hidden;
+  font-size: 12px;
+  font-style: italic;
+  color: #64748b;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sched-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sched-delete { color: #b91c1c; }
+.sched-delete:hover:not(:disabled) { border-color: #fca5a5; background: #fef2f2; }
+
+.sched-dot {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.sched-dot--completed { background: #16a34a; }
+.sched-dot--failed { background: #dc2626; }
+.sched-dot--running { background: #4f46e5; }
+.sched-dot--queued { background: #94a3b8; }
+.sched-dot--retrying { background: #f59e0b; }
+.sched-dot--paused,
+.sched-dot--skipped,
+.sched-dot--interrupted { background: #f59e0b; }
+
+/* ── Run history ──────────────────────────────────────────────────────────── */
+.sched-runs {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 6px;
+}
+
+.sched-run-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  width: 100%;
+  padding: 5px 4px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  color: #334155;
+  cursor: pointer;
+}
+
+.sched-run-row:hover { background: #f8fafc; }
+
+.sched-run-status {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.sched-run-time { margin-left: auto; color: #64748b; }
+
+.sched-run-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 4px 8px 19px;
+}
+
+.sched-output {
+  max-height: 220px;
+  margin: 0;
+  padding: 8px 10px;
+  overflow: auto;
+  border-radius: 6px;
+  background: #f8fafc;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #0f172a;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ── Webhooks (WebhooksPanel reuses the schedule card styles) ─────────────── */
+.hook-reveal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hook-reveal p {
+  margin: 0;
+}
+
+.hook-copy-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hook-url {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  overflow-wrap: anywhere;
+  border-radius: 6px;
+  background: #fff;
+  color: #1e293b;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11.5px;
+}
+
+/* Chat links (ChatLinksPanel): QR code beside the link's stats */
+.chatlink-share {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.chatlink-qr {
+  width: 112px;
+  height: 112px;
+  flex-shrink: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+.chatlink-modal { width: 560px; }
+.chatlink-add-another { align-self: flex-start; padding: 2px 0; border: none; background: none; color: #64748b;
+  font-size: 12px; cursor: pointer; }
+.chatlink-add-another:hover { color: #4f46e5; text-decoration: underline; }
+
+.chatlink-gen-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+
+.chatlink-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  color: #1e293b;
+}
+
+.chatlink-check input { margin-top: 2px; }
+
+/* Chat link → Embed on a website */
+.chatlink-embed { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding-top: 10px;
+  border-top: 1px dashed #e2e8f0; }
+.chatlink-embed p { margin: 0; }
+.chatlink-embed-tabs { display: inline-flex; gap: 4px; padding: 3px; border-radius: 8px; background: #f1f5f9; align-self: flex-start; }
+.chatlink-embed-tab { padding: 4px 12px; border: none; border-radius: 6px; background: transparent; color: #475569;
+  font: inherit; font-size: 12px; cursor: pointer; }
+.chatlink-embed-tab--on { background: #fff; color: #0f172a; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08); }
+.chatlink-embed-code { max-height: 220px; overflow: auto; white-space: pre; font-size: 11px; }

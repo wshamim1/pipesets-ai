@@ -1,0 +1,69 @@
+# ── Web framework ─────────────────────────────────────────────────────────────
+fastapi>=0.110.0
+uvicorn>=0.28.0
+python-multipart>=0.0.9        # file uploads (doc loader, knowledge base)
+openpyxl>=3.1                   # eval: Excel import / export of test cases and results
+
+# ── Data validation ───────────────────────────────────────────────────────────
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# ── Configuration ─────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0
+
+# ── Scheduling ────────────────────────────────────────────────────────────────
+croniter>=2.0                  # cron parsing for scheduled pipeline runs (services/scheduler.py)
+redis>=5.0                     # shared rate limits / cancel signals when PIPESETS_SHARED_STATE=redis (services/shared_state.py)
+prometheus-client>=0.20        # /metrics (services/telemetry.py)
+opentelemetry-sdk>=1.45        # run / LLM / tool / job spans, exported when OTEL_EXPORTER_OTLP_ENDPOINT is set
+opentelemetry-exporter-otlp-proto-http>=1.45
+tzdata                         # IANA timezones for zoneinfo on systems without them (Windows, slim images)
+
+# ── HTTP client ───────────────────────────────────────────────────────────────
+httpx>=0.27.0                  # REST API caller tool, Slack webhook, Tavily search
+
+# ── LLM providers ─────────────────────────────────────────────────────────────
+litellm==1.103.2               # optional legacy fallback behind our gateway (backend/llm/); pinned
+openai>=1.14.0                 # direct OpenAI calls + embeddings
+anthropic>=0.18.0              # Anthropic Claude (also used by litellm)
+
+# ── Serialisation ─────────────────────────────────────────────────────────────
+pyyaml>=6.0                    # OpenAPI export, docker-compose export
+reportlab>=4.0.0               # PDF generation tool
+
+# ── App database (DATABASE_URL; SQLite by default) ────────────────────────────
+sqlalchemy>=2.0                # engine + connection pool for any DATABASE_URL
+alembic>=1.13                  # schema migrations (backend/migrations)
+# pyodbc>=5.0                  # SQL Server: mssql+pyodbc:// (also needs Microsoft ODBC Driver 18)
+
+# ── Database drivers ──────────────────────────────────────────────────────────
+psycopg2-binary>=2.9.0         # PostgreSQL (app DB via postgresql+psycopg2://, mcp_database / sql_database tools)
+pymysql>=1.0.0                 # MySQL / MariaDB tool support
+# snowflake-connector-python   # uncomment for the snowflake_reader tool
+# pymongo>=4.6                 # uncomment for the mongodb_reader tool
+
+# ── AWS ───────────────────────────────────────────────────────────────────────
+boto3>=1.26.0                  # S3 reader tool
+
+# ── Web search ────────────────────────────────────────────────────────────────
+cryptography>=42.0               # secrets vault encryption (Fernet)
+ddgs>=9.0                      # DuckDuckGo web search (no API key required)
+
+# ── Document ingestion ────────────────────────────────────────────────────────
+pypdf>=4.0.0                   # PDF loader (doc loader node)
+pypdfium2>=4.0.0               # renders scanned PDF pages for OCR (loaders/_ocr.py)
+pillow>=10.0.0                 # image OCR input (loaders/_ocr.py)
+lxml>=4.9.0                    # HTML / XML document parsing
+docling>=1.0.0                 # advanced document parsing (PDF/DOCX/PPTX/HTML)
+# Intel Macs: torch stops at 2.2.2 (last macOS x86_64 wheel), which was built against NumPy 1.x,
+# and transformers 5 turns PyTorch off below 2.4 (Docling's layout model then can't load)
+numpy<2; sys_platform == "darwin" and platform_machine == "x86_64"
+transformers<5; sys_platform == "darwin" and platform_machine == "x86_64"
+
+# ── Tokenisation (used by litellm + token budgets) ────────────────────────────
+tiktoken>=0.5.0
+tokenizers>=0.15.0
+
+# ── RAG / Embeddings (optional — needed only for retriever nodes) ─────────────
+# sentence-transformers>=2.2.0 # local embeddings; uncomment to enable
+# chromadb>=0.4.0              # ChromaDB vector store; uncomment if using Chroma retriever

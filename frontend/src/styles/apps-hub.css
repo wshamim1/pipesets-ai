@@ -1,0 +1,86 @@
+/*
+ * apps-hub.css — Apps page surfaces. The page sits on --app-bg so the white
+ * metric tiles and cards read as raised planes; hover lifts a card slightly.
+ */
+
+.apps-hub {
+  background: var(--app-bg);
+}
+
+.apps-hub-metric {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 14px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  box-shadow: var(--surface-shadow);
+}
+
+.apps-hub-metric-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.apps-hub-metric-value {
+  margin-top: 4px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--metric-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.apps-hub-metric-value--text {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.apps-hub-metric-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: var(--metric-accent);
+  background: color-mix(in srgb, var(--metric-accent) 10%, var(--surface));
+}
+
+.apps-hub-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  box-shadow: var(--surface-shadow);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.apps-hub-card:hover {
+  border-color: var(--surface-hover-border);
+  box-shadow: 0 2px 4px rgba(30, 58, 95, 0.04), 0 8px 20px -6px rgba(30, 58, 95, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Ring instead of a thicker border so the selected card doesn't shift its content */
+.apps-hub-card--selected,
+.apps-hub-card--selected:hover {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15), var(--surface-shadow);
+}
+
+.apps-hub-card-actions button {
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.apps-hub-card-actions button:hover:not(:disabled) {
+  filter: brightness(0.96);
+}

@@ -1,0 +1,36 @@
+server {
+    listen 8080;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # API reverse proxy: /api/foo -> ${BACKEND_URL}/foo
+    location /api/ {
+        proxy_pass ${BACKEND_URL}/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Server-sent events (streaming runs) must not be buffered.
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+        client_max_body_size 100m;   # document / knowledge-base uploads
+    }
+
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Public chat links open their own page (chat.html), not the builder
+    location /c/ {
+        try_files /chat.html =404;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

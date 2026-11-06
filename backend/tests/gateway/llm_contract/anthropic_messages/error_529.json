@@ -1,0 +1,49 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "HTTP 529 before any output",
+  "providers": {
+    "anthropic": "claude-haiku-5-5"
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be brief."
+      },
+      {
+        "role": "user",
+        "content": "Say hello."
+      }
+    ],
+    "max_tokens": 64
+  },
+  "responses": {
+    "stream": {
+      "status": 529,
+      "body": {
+        "type": "error",
+        "error": {
+          "type": "overloaded_error",
+          "message": "Overloaded"
+        }
+      }
+    },
+    "complete": {
+      "status": 529,
+      "body": {
+        "type": "error",
+        "error": {
+          "type": "overloaded_error",
+          "message": "Overloaded"
+        }
+      }
+    }
+  },
+  "expect": {
+    "error": {
+      "status": 529,
+      "retryable": true,
+      "message_contains": "Overloaded"
+    }
+  }
+}

@@ -1,0 +1,61 @@
+# Production edge: TLS (Let's Encrypt) and network isolation, on top of compose.yaml.
+#
+#   docker compose -f compose.yaml -f compose.edge.yaml up -d --build
+#
+# Set PUBLIC_HOST, UI_HOST and LETSENCRYPT_EMAIL in .env and point both DNS names at this host
+# (ports 80 and 443 open). Then:
+#   https://$PUBLIC_HOST/v1/*   public API and webhooks — the only thing reachable from outside
+#   https://$UI_HOST/           the UI and its /api; restrict it in ../edge/ui-allow.conf
+# The backend and frontend no longer publish ports, so nothing bypasses the edge.
+
+services:
+  edge:
+    build:
+      context: ../edge
+    image: pipesets-ai-edge:latest
+    restart: unless-stopped
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:?set PUBLIC_HOST in .env, e.g. api.example.com}
+      UI_HOST: ${UI_HOST:?set UI_HOST in .env, e.g. app.example.com}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../edge/ui-allow.conf:/etc/nginx/ui-allow.conf:ro
+      - letsencrypt:/etc/letsencrypt:ro
+      - acme-webroot:/var/www/certbot:ro
+    depends_on:
+      - backend
+      - frontend
+
+  certbot:
+    image: certbot/certbot:v3.0.1
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/certbot.sh"]
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST}
+      UI_HOST: ${UI_HOST}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?set LETSENCRYPT_EMAIL in .env}
+      LETSENCRYPT_STAGING: ${LETSENCRYPT_STAGING:-0}
+    volumes:
+      - ../edge/certbot.sh:/certbot.sh:ro
+      - letsencrypt:/etc/letsencrypt
+      - acme-webroot:/var/www/certbot
+
+  backend:
+    ports: !reset []
+    environment:
+      # The client address the edge sends, for the audit log. Safe only because the
+      # backend has no published port: every request arrives through the proxies.
+      FORWARDED_ALLOW_IPS: "*"
+
+  frontend:
+    ports: !reset []
+    build:
+      args:
+        VITE_PUBLIC_API_URL: https://${PUBLIC_HOST}
+        VITE_UI_URL: https://${UI_HOST}
+
+volumes:
+  letsencrypt:
+  acme-webroot:

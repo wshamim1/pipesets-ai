@@ -1,0 +1,50 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "HTTP 404 before any output",
+  "providers": {
+    "openai": "gpt-4o-mini"
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be brief."
+      },
+      {
+        "role": "user",
+        "content": "Say hello."
+      }
+    ]
+  },
+  "responses": {
+    "stream": {
+      "status": 404,
+      "body": {
+        "error": {
+          "message": "The model `gpt-9` does not exist or you do not have access to it.",
+          "type": "invalid_request_error",
+          "param": null,
+          "code": null
+        }
+      }
+    },
+    "complete": {
+      "status": 404,
+      "body": {
+        "error": {
+          "message": "The model `gpt-9` does not exist or you do not have access to it.",
+          "type": "invalid_request_error",
+          "param": null,
+          "code": null
+        }
+      }
+    }
+  },
+  "expect": {
+    "error": {
+      "status": 404,
+      "retryable": false,
+      "message_contains": "The model `gpt-9` does not exi"
+    }
+  }
+}

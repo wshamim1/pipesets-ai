@@ -1,0 +1,393 @@
+/* ================================================================
+   MEMORY NODE STYLES
+   ================================================================ */
+
+.memory-node-card {
+  background: #ffffff;
+  border: 1px solid #a7f3d0;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.08);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.memory-node-card.selected {
+  border-color: #059669;
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25), 0 4px 12px rgba(5, 150, 105, 0.12);
+}
+
+.memory-header {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border-bottom: 1px solid #a7f3d0;
+}
+
+.mem-handle {
+  background: #059669 !important;
+  border-color: #065f46 !important;
+}
+
+.mem-session-id {
+  font-size: 10px;
+  color: #065f46;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* Memory sidebar drag cards */
+.memory-drag-card {
+  border-color: #a7f3d0;
+  background: linear-gradient(145deg, #f0fdf4, #ecfdf5);
+}
+
+.memory-drag-card:hover {
+  border-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(5, 150, 105, 0.15);
+}
+
+.memory-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: calc(100vh - 400px);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* Memory config panel status */
+.memory-status-box {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #065f46;
+  font-weight: 600;
+}
+
+.mem-dot {
+  background: #059669 !important;
+  box-shadow: 0 0 4px rgba(5, 150, 105, 0.5) !important;
+}
+
+/* Clear session button */
+.mem-clear-btn {
+  background: #ffffff;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mem-clear-btn:hover {
+  background: #d1fae5;
+  border-color: #059669;
+}
+
+/* ================================================================
+   CACHE NODE STYLES
+   ================================================================ */
+
+.chip-cache {
+  background: #fefce8;
+  color: #854d0e;
+  border: 1px solid #fde68a;
+}
+
+.cache-node-card {
+  background: #ffffff;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.1);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.cache-node-card.selected {
+  border-color: #ca8a04;
+  box-shadow: 0 0 0 2px rgba(202, 138, 4, 0.25), 0 4px 12px rgba(202, 138, 4, 0.14);
+}
+
+.cache-header {
+  background: linear-gradient(135deg, #fefce8, #fef9c3);
+  border-bottom: 1px solid #fde68a;
+}
+
+.cache-handle {
+  background: #ca8a04 !important;
+  border-color: #854d0e !important;
+}
+
+.cache-footer-status {
+  font-size: 10px;
+  color: #854d0e;
+}
+
+/* Cache sidebar drag cards */
+.cache-drag-card {
+  border-color: #fde68a;
+  background: linear-gradient(145deg, #fefce8, #fef9c3);
+}
+
+.cache-drag-card:hover {
+  border-color: #ca8a04;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(202, 138, 4, 0.18);
+}
+
+.cache-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: calc(100vh - 400px);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* Cache config panel */
+.cache-status-box {
+  background: #fefce8;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #854d0e;
+  font-weight: 600;
+}
+
+.cache-dot {
+  background: #ca8a04 !important;
+  box-shadow: 0 0 4px rgba(202, 138, 4, 0.5) !important;
+}
+
+.cache-clear-btn {
+  background: #ffffff;
+  border: 1px solid #fde68a;
+  color: #854d0e;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cache-clear-btn:hover {
+  background: #fef9c3;
+  border-color: #ca8a04;
+}
+
+/* Cache stats grid in config panel */
+.cache-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.cache-stat-box {
+  background: #fefce8;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.cache-stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #854d0e;
+  line-height: 1;
+}
+
+.cache-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #92400e;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+
+/* ================================================================
+   HUMAN GATE NODE STYLES
+   ================================================================ */
+
+.human-gate-node-card {
+  background: #ffffff;
+  border: 1px solid #c4b5fd;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.human-gate-node-card.selected {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25), 0 4px 12px rgba(124, 58, 237, 0.12);
+}
+
+.human-gate-header {
+  background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+  border-bottom: 1px solid #c4b5fd;
+}
+
+.hg-handle {
+  background: #7c3aed !important;
+  border-color: #4c1d95 !important;
+}
+
+.hg-footer-status {
+  font-size: 10px;
+  color: #4c1d95;
+}
+
+/* ================================================================
+   WORKFLOW STEP NODE STYLES (conversational workflows)
+   ================================================================ */
+
+.wf-step-node-card {
+  background: #ffffff;
+  border: 1px solid #99f6e4;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.08);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.wf-step-node-card.selected {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.25), 0 4px 12px rgba(13, 148, 136, 0.12);
+}
+
+.wf-step-header {
+  background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+  border-bottom: 1px solid #99f6e4;
+}
+
+.wf-handle {
+  background: #0d9488 !important;
+  border-color: #115e59 !important;
+}
+
+.wf-chip {
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+}
+
+.wf-step-summary {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wf-footer-status {
+  font-size: 10px;
+  color: #115e59;
+}
+
+.wf-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* ================================================================
+   OUTPUT PARSER NODE STYLES
+   ================================================================ */
+
+.output-parser-node-card {
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.08);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.output-parser-node-card.selected {
+  border-color: #ea580c;
+  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.25), 0 4px 12px rgba(234, 88, 12, 0.12);
+}
+
+.output-parser-header {
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border-bottom: 1px solid #fed7aa;
+}
+
+.op-handle {
+  background: #ea580c !important;
+  border-color: #9a3412 !important;
+}
+
+.op-footer-status {
+  font-size: 10px;
+  color: #9a3412;
+}
+
+/* ================================================================
+   CHECKPOINTER NODE STYLES
+   ================================================================ */
+
+.checkpointer-node-card {
+  background: #ffffff;
+  border: 1px solid #c7d2fe;
+  border-radius: 12px;
+  min-width: 220px;
+  max-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.checkpointer-node-card.selected {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.25), 0 4px 12px rgba(79, 70, 229, 0.12);
+}
+
+.checkpointer-header {
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  border-bottom: 1px solid #c7d2fe;
+}
+
+.cp-handle {
+  background: #4f46e5 !important;
+  border-color: #3730a3 !important;
+}
+
+.cp-footer-status {
+  font-size: 10px;
+  color: #3730a3;
+}

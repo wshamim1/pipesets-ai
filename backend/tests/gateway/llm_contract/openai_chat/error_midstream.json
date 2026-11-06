@@ -1,0 +1,54 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "The stream starts, then an error object arrives in a data line",
+  "providers": {
+    "openai": "gpt-4o-mini"
+  },
+  "modes": [
+    "stream"
+  ],
+  "request": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "Say hello."
+      }
+    ]
+  },
+  "responses": {
+    "stream": {
+      "status": 200,
+      "events": [
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [
+            {
+              "index": 0,
+              "delta": {
+                "role": "assistant",
+                "content": "Hel"
+              },
+              "finish_reason": null
+            }
+          ]
+        },
+        {
+          "error": {
+            "message": "The server had an error while processing your request.",
+            "type": "server_error",
+            "param": null,
+            "code": null
+          }
+        }
+      ]
+    }
+  },
+  "expect": {
+    "error": {
+      "message_contains": "The server had an error"
+    }
+  }
+}

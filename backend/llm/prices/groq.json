@@ -1,0 +1,15 @@
+{
+  "provider": "groq",
+  "_about": "Model prices for the LLM gateway (llm/pricing.py), keyed by the model name set on the LLM node. Override or add locally in <data dir>/prices/<provider>.json.",
+  "unit": "USD per 1M tokens",
+  "source": "LiteLLM 1.103.2 model_cost via scripts/seed_prices.py, 2026-10-28",
+  "models": {
+    "llama-guard-3-8b": {"in": 0.2, "out": 0.2},
+    "meta-llama/llama-prompt-guard-2-22m": {"in": 0.03, "out": 0.03},
+    "meta-llama/llama-prompt-guard-2-86m": {"in": 0.04, "out": 0.04},
+    "openai/gpt-oss-120b": {"in": 0.15, "out": 0.6, "cache_read": 0.075},
+    "openai/gpt-oss-20b": {"in": 0.075, "out": 0.3, "cache_read": 0.0375},
+    "openai/gpt-oss-safeguard-20b": {"in": 0.075, "out": 0.3, "cache_read": 0.037},
+    "qwen/qwen3.8-27b": {"in": 0.8, "out": 4.0}
+  }
+}

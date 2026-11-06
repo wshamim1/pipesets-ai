@@ -1,0 +1,105 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "Cut off by max_tokens",
+  "providers": {
+    "openai": "gpt-4o-mini",
+    "jan": "llama3.2-3b",
+    "llamacpp": "gemma-3-1b",
+    "ollama": "qwen3:4b"
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be brief."
+      },
+      {
+        "role": "user",
+        "content": "Say hello."
+      }
+    ],
+    "max_tokens": 2
+  },
+  "responses": {
+    "stream": {
+      "status": 200,
+      "events": [
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [
+            {
+              "index": 0,
+              "delta": {
+                "role": "assistant",
+                "content": "Hello"
+              },
+              "finish_reason": null
+            }
+          ]
+        },
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [
+            {
+              "index": 0,
+              "delta": {},
+              "finish_reason": "length"
+            }
+          ]
+        },
+        {
+          "id": "chatcmpl-1",
+          "object": "chat.completion.chunk",
+          "created": 1761700000,
+          "model": "gpt-4o-mini",
+          "choices": [],
+          "usage": {
+            "prompt_tokens": 21,
+            "completion_tokens": 2,
+            "total_tokens": 23
+          }
+        },
+        "[DONE]"
+      ]
+    },
+    "complete": {
+      "status": 200,
+      "body": {
+        "id": "chatcmpl-1",
+        "object": "chat.completion",
+        "created": 1761700000,
+        "model": "gpt-4o-mini",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Hello"
+            },
+            "finish_reason": "length"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 21,
+          "completion_tokens": 2,
+          "total_tokens": 23
+        }
+      }
+    }
+  },
+  "expect": {
+    "text": "Hello",
+    "finish_reason": "length",
+    "usage": {
+      "prompt_tokens": 21,
+      "completion_tokens": 2,
+      "total_tokens": 23
+    }
+  }
+}

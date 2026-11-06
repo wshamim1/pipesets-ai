@@ -1,0 +1,97 @@
+# Optional; not in kustomization.yaml. Needs ingress-nginx and cert-manager (for Let's Encrypt).
+# Edit the hosts and the email, then `kubectl apply -f ingress.yaml`.
+#
+#   api.example.com  public API — /v1/* (published apps, /v1/hooks/* webhooks, /v1/chat/* chat links), to
+#                    the backend; and the chat-link page (/c/<token>, /assets/*), to the frontend
+#   app.example.com  the UI and its /api, to the frontend; narrow it with whitelist-source-range
+#
+# networkpolicy.yaml admits the ingress controller to exactly these two services.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # staging, for trying it out: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: ops@example.com
+    privateKeySecretRef: {name: letsencrypt-account}
+    solvers:
+      - http01:
+          ingress: {ingressClassName: nginx}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pipesets-ai-public
+  namespace: pipesets-ai
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"      # SSE streaming
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-body-size: 25m
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [api.example.com]
+      secretName: pipesets-ai-public-tls
+  rules:
+    - host: api.example.com
+      http:
+        paths:
+          # Only /v1 and the chat-link page exist on this host; anything else is the controller's 404.
+          - path: /v1/
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port: {number: 8000}
+          # Chat links (/c/<token>): the frontend answers with chat.html, which loads /assets/*
+          - path: /c/
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port: {number: 80}
+          - path: /assets/
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port: {number: 80}
+          - path: /favicon.svg
+            pathType: Exact
+            backend:
+              service:
+                name: frontend
+                port: {number: 80}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pipesets-ai-ui
+  namespace: pipesets-ai
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m      # document uploads
+    # For a pilot, only the office / VPN ranges (the UI still requires sign-in):
+    # nginx.ingress.kubernetes.io/whitelist-source-range: "10.8.0.0/16,203.0.113.0/24"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [app.example.com]
+      secretName: pipesets-ai-ui-tls
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port: {number: 80}

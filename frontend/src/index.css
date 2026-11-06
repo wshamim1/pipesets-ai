@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Surface layers — page < canvas < panel, so cards and panels read as
+     distinct planes instead of one sheet of white. */
+  --app-bg: #eef2f7;
+  --canvas-bg: #f4f7fb;
+  --canvas-dot: #c3cddb;
+  --surface: #fbfcfe;
+  --surface-subtle: #f2f5fa;
+  --surface-border: #d6dee9;
+  --surface-hover-border: #bccadb;
+  /* Top header bar */
+  --nav-height: 56px;
+  --nav-bg: linear-gradient(90deg, #1e1b4b 0%, #272463 55%, #312e81 100%);
+  --nav-ring: #24215a;          /* solid stand-in for --nav-bg (badge cut-outs) */
+  --nav-divider: rgba(165, 180, 252, 0.18);
+  --nav-text: #c7d2fe;
+  --nav-text-strong: #ffffff;
+  --nav-hover-bg: rgba(255, 255, 255, 0.08);
+  --surface-shadow: 0 1px 2px rgba(30, 58, 95, 0.04), 0 2px 8px -2px rgba(30, 58, 95, 0.05);
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #0f172a;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+body {
+  background:
+    radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.06), transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(59, 130, 246, 0.06), transparent 40%),
+    var(--app-bg);
+  color: #0f172a;
+}

@@ -1,0 +1,50 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "HTTP 429 before any output",
+  "providers": {
+    "openai": "gpt-4o-mini"
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be brief."
+      },
+      {
+        "role": "user",
+        "content": "Say hello."
+      }
+    ]
+  },
+  "responses": {
+    "stream": {
+      "status": 429,
+      "body": {
+        "error": {
+          "message": "Rate limit reached for gpt-4o-mini on requests per min (RPM): Limit 3.",
+          "type": "requests",
+          "param": null,
+          "code": null
+        }
+      }
+    },
+    "complete": {
+      "status": 429,
+      "body": {
+        "error": {
+          "message": "Rate limit reached for gpt-4o-mini on requests per min (RPM): Limit 3.",
+          "type": "requests",
+          "param": null,
+          "code": null
+        }
+      }
+    }
+  },
+  "expect": {
+    "error": {
+      "status": 429,
+      "retryable": true,
+      "message_contains": "Rate limit reached"
+    }
+  }
+}

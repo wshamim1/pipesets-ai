@@ -1,0 +1,388 @@
+/* ========================================= */
+/* MODAL STYLES                              */
+/* ========================================= */
+.modal-backdrop,
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.modal-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+  width: 100%;
+  max-width: 460px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-card.wide {
+  max-width: 600px;
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.modal-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.modal-close-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.modal-form {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-input {
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+/* Footer buttons — .cancel-btn / .save-btn are the names the conn-modal-shell
+   popups use; inside a footer they get the same look as the modal-* pair. */
+.modal-cancel-btn,
+.conn-modal-footer .cancel-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.modal-cancel-btn:hover:not(:disabled),
+.conn-modal-footer .cancel-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.modal-create-btn,
+.conn-modal-footer .save-btn {
+  flex: none;
+  background: #2563eb;
+  color: #ffffff;
+  border: 1px solid #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.modal-create-btn:hover:not(:disabled),
+.conn-modal-footer .save-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  transform: none;
+  box-shadow: none;
+}
+
+.modal-cancel-btn:disabled,
+.modal-create-btn:disabled,
+.conn-modal-footer .cancel-btn:disabled,
+.conn-modal-footer .save-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Modal Apps List */
+.modal-body {
+  padding: 14px 20px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.modal-apps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.app-list-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.app-list-item:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.app-list-item.active {
+  border-color: #3b82f6;
+  background: #f0f7ff;
+}
+
+.app-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.app-item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-item-title-row strong {
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.active-pill {
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.app-item-desc {
+  margin: 0;
+  font-size: 11px;
+  color: #64748b;
+  max-width: 340px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-item-meta {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.app-item-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.load-app-btn {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-app-btn {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-app-btn:hover {
+  background: #fef2f2;
+}
+
+@media (max-width: 1280px) {
+  .bottom-config-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 990px) {
+  .app-shell {
+    grid-template-columns: 1fr !important;
+  }
+  .panel-resize-handle { display: none; }
+  .panel-left { margin-right: 0; }
+  .center-workspace { margin-right: 0; margin-left: 0; }
+}
+
+/* ================================================================
+   DARK MODAL CONTAINER  (used by SkillsModal)
+   ================================================================ */
+
+.modal-container {
+  background: #1e293b;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.modal-container .modal-header {
+  background: #0f172a;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  padding: 14px 20px;
+}
+
+.modal-container .modal-header h2 {
+  color: #f1f5f9;
+}
+
+.modal-container .modal-close-btn {
+  color: #64748b;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.modal-container .modal-close-btn:hover {
+  color: #f1f5f9;
+}
+
+/* ================================================================
+   SHARED BUTTON SYSTEM  (.btn, .btn-primary, .btn-secondary)
+   ================================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+/* dark-surface variant — used inside dark modals (SkillsModal) */
+.modal-container .btn-secondary {
+  background: rgba(30, 41, 59, 0.6);
+  color: #cbd5e1;
+  border-color: rgba(148, 163, 184, 0.25);
+}
+
+.modal-container .btn-secondary:hover:not(:disabled) {
+  background: rgba(51, 65, 85, 0.8);
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+.modal-container .btn-primary {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.modal-container .btn-primary:hover:not(:disabled) {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Sidebar "Manage Skills Catalog" button — amber accent to match skill theme */
+.btn.btn-secondary.full-width {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  color: #92400e;
+  border: 1.5px dashed #fbbf24;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.btn.btn-secondary.full-width:hover:not(:disabled) {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  border-style: solid;
+}
+

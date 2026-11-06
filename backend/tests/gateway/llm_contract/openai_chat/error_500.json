@@ -1,0 +1,50 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "HTTP 500 before any output",
+  "providers": {
+    "openai": "gpt-4o-mini"
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be brief."
+      },
+      {
+        "role": "user",
+        "content": "Say hello."
+      }
+    ]
+  },
+  "responses": {
+    "stream": {
+      "status": 500,
+      "body": {
+        "error": {
+          "message": "The server had an error while processing your request.",
+          "type": "server_error",
+          "param": null,
+          "code": null
+        }
+      }
+    },
+    "complete": {
+      "status": 500,
+      "body": {
+        "error": {
+          "message": "The server had an error while processing your request.",
+          "type": "server_error",
+          "param": null,
+          "code": null
+        }
+      }
+    }
+  },
+  "expect": {
+    "error": {
+      "status": 500,
+      "retryable": true,
+      "message_contains": "The server had an error while "
+    }
+  }
+}

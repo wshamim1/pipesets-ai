@@ -1,0 +1,792 @@
+/* ================================================================
+   CONNECTION MODAL — split layout (left nav + right config)
+   ================================================================ */
+
+.conn-modal-shell {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+  width: min(820px, 96vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.conn-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+/* Two-column body */
+.conn-modal-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Left nav ── */
+.conn-provider-nav {
+  width: 176px;
+  flex-shrink: 0;
+  background: #f8fafc;
+  border-right: 1px solid #e9eef5;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.conn-nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 8px 6px;
+}
+
+.conn-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.conn-nav-item:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.conn-nav-item.active {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.15);
+}
+
+.conn-nav-icon {
+  font-size: 15px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.conn-nav-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conn-nav-item.active .conn-nav-name {
+  color: #1d4ed8;
+}
+
+.conn-nav-tag {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  background: #e2e8f0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.conn-nav-item.active .conn-nav-tag {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* ── Right config panel ── */
+.conn-config-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.conn-config-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px;
+}
+
+/* Section sub-headings inside config */
+.conn-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.conn-section-label:not(:first-child) {
+  margin-top: 16px;
+}
+
+.conn-nav-divider {
+  border-top: 1px solid #e9eef5;
+  margin: 12px 4px 10px;
+}
+
+.conn-nav-sub {
+  font-size: 10px;
+  color: #94a3b8;
+  line-height: 1.2;
+  margin-top: 1px;
+}
+
+.conn-modal-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.conn-modal-subtitle {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Preset chips */
+.conn-preset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.conn-preset-chip {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+
+.conn-preset-chip:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.conn-preset-chip.active {
+  background: #dbeafe;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+/* Footer */
+.conn-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+
+
+/* ================================================================
+   CUSTOM MCP STYLES & MODAL
+   ================================================================ */
+
+.mcp-presets-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  overflow-x: auto;
+}
+
+.preset-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 2px;
+}
+
+.preset-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.preset-btn:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.custom-mcp-modal {
+  width: min(680px, 94vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-mcp-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-actions-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.mcp-test-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 14px;
+}
+
+.mcp-test-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mcp-test-btn {
+  background: #ffffff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.mcp-test-btn:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.mcp-test-btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.mcp-test-banner {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.mcp-test-banner.success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.mcp-test-banner.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.mcp-discovered-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.mcp-tool-pill {
+  background: #ffffff;
+  border: 1px solid #bbf7d0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  color: #166534;
+}
+
+.custom-mcp-tools-badge {
+  font-size: 10px;
+  color: #0284c7;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+/* ================================================================
+   CONNECTION CARDS & STATUS STYLES
+   ================================================================ */
+
+.connection-card {
+  border-left: 3px solid #6366f1;
+}
+
+.chip-connected {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.chip-untested {
+  background: #fefce8;
+  color: #854d0e;
+  border: 1px solid #fef08a;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* Sidebar connection list — one row: icon · name/meta · actions */
+.connection-card--compact {
+  padding: 6px 8px;
+  border-radius: 8px;
+  gap: 0;
+}
+
+.connection-card-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.connection-card-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.connection-card-name,
+.connection-card-meta,
+.connection-card-error {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.connection-card-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.connection-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.connection-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #eab308;
+}
+
+.connection-status-dot.is-connected { background: #22c55e; }
+.connection-status-dot.is-error { background: #ef4444; }
+
+.connection-card-actions {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.connection-card--compact:hover .connection-card-actions,
+.connection-card--compact:focus-within .connection-card-actions {
+  opacity: 1;
+}
+
+.secret-kind-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.secret-kind-option {
+  padding: 7px 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+}
+
+.secret-kind-option.active {
+  border-color: #6366f1;
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.secret-kind-option:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.secret-icon {
+  width: 18px;
+  height: 18px;
+  color: #b45309;
+  background: #fef3c7;
+}
+
+.secret-icon--llm {
+  color: #6d28d9;
+  background: #ede9fe;
+}
+
+.tool-secret-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tool-secret-fields .field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tool-secret-row {
+  display: grid;
+  grid-template-columns: minmax(70px, auto) 1fr;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.tool-secret-key {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: #475569;
+}
+
+.tool-secret-required {
+  color: #dc2626;
+  margin-left: 2px;
+}
+
+.tool-secret-select {
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+.tool-secret-warning {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 10px;
+  color: #b45309;
+}
+
+.tool-secret-warning button {
+  border: 1px solid #fcd34d;
+  background: #fffbeb;
+  color: #92400e;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 8px;
+  cursor: pointer;
+}
+
+.api-key-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.secret-shared-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #334155;
+}
+
+.connection-card-error {
+  margin-top: 3px;
+  padding-left: 26px;
+  font-size: 10px;
+  color: #b91c1c;
+}
+
+.active-provider-tab {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.2);
+}
+.connection-node-card {
+  border-left: 4px solid #6366f1;
+}
+
+.connection-node-header {
+  background: linear-gradient(135deg, #f8fafc, #eff6ff);
+  border-bottom: 1px solid #e0e7ff;
+}
+/* ================================================================
+   KNOWLEDGE BASE STYLES
+   ================================================================ */
+
+.kb-card {
+  border-left: 3px solid #4338ca;
+}
+
+.chip-kb {
+  background: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.kb-node-card {
+  border-left: 4px solid #4338ca;
+}
+
+.kb-node-header {
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  border-bottom: 1px solid #c7d2fe;
+}
+
+/* ================================================================
+   SKILL FORM FIELD CLASSES  (used in SkillsModal create/edit form)
+   Dark-surface versions of the config-panel field styles
+   ================================================================ */
+
+.config-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 4px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.config-input,
+.config-textarea,
+.config-select {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #e2e8f0;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.config-input:focus,
+.config-textarea:focus,
+.config-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.config-input::placeholder,
+.config-textarea::placeholder {
+  color: #475569;
+}
+
+.config-select option {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+.config-textarea {
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.5;
+}
+
+/* ================================================================
+   SHARED TOOL-CARD UTILITY CLASSES (KB, Connection, Skill cards)
+   ================================================================ */
+
+.tool-card-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tool-card-icon {
+  font-size: 15px;
+  line-height: 1;
+  flex-shrink: 0;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.connection-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.tool-card-desc {
+  margin: 2px 0 0 0;
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.4;
+  /* clamp to 2 lines so cards stay compact */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ================================================================
+   SKILL NODE & CARD STYLES
+   ================================================================ */
+
+.skill-card {
+  border-left: 3px solid #d97706 !important;
+}
+
+.skill-node-card {
+  border-left: 4px solid #d97706 !important;
+}
+
+.skill-node-header {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7) !important;
+  border-bottom: 1px solid #fde68a !important;
+}
+
+.chip-skill {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+  border: 1px solid #fde68a !important;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ================================================================
+   KNOWLEDGE BASE MODAL — extra utilities
+   ================================================================ */
+
+.kb-drop-zone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.kb-drop-zone:hover {
+  background: #eff6ff !important;
+  border-color: #93c5fd !important;
+}
+
+.kb-provider-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+
+/* Header icon tile + heading (CustomMcpModal) */
+.conn-modal-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.conn-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  font-size: 18px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.conn-error {
+  margin: 0 0 10px;
+}

@@ -1,0 +1,378 @@
+/*
+ * right-panel.css — Run tab polish: one-line context, empty state with
+ * suggested prompts, and a compact composer pinned to the bottom.
+ * Imported after chat.css / prompt-runner.css so these rules win.
+ */
+
+.runner-panel-body {
+  padding: 10px 12px 12px;
+  gap: 8px;
+}
+
+/* One-line "what will this run use" context */
+.runner-meta-banner--compact {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.runner-meta-banner--compact strong {
+  color: #0f172a;
+  font-weight: 600;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
+}
+
+/* Published pipelines the run calls, with what each one uses */
+.runner-subpipelines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 6px;
+  padding: 6px 10px;
+  border: 1px solid #e0e7ff;
+  border-radius: 8px;
+  background: #f8faff;
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+.runner-subpipeline-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  align-items: baseline;
+}
+
+.runner-subpipeline-name {
+  color: #4338ca;
+  font-weight: 600;
+}
+
+.runner-subpipeline-error {
+  color: #b45309;
+}
+
+.runner-tab-bar {
+  margin: 0;
+}
+
+.runner-tab {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+/* Empty state: the chat area doubles as the place to pick a starting prompt */
+.chat-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  margin: auto 0;
+  padding: 16px 4px;
+  text-align: left;
+  color: #475569;
+}
+
+.chat-empty-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.chat-empty-sub {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.chat-empty-sub-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.suggested-prompts-refresh {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4f46e5;
+  cursor: pointer;
+}
+
+.suggested-prompts-refresh:hover:not(:disabled) {
+  border-color: #c7d2fe;
+  background: #f5f7ff;
+}
+
+.suggested-prompts-refresh:disabled {
+  color: #94a3b8;
+  cursor: default;
+}
+
+.suggested-prompts-error {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: #dc2626;
+}
+
+.chat-empty .suggested-prompts-row {
+  gap: 6px;
+}
+
+.chat-empty .suggested-prompt-card {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.chat-empty .suggested-prompt-card:hover:not(:disabled) {
+  border-color: #c7d2fe;
+  background: #f5f7ff;
+  transform: none;
+}
+
+.chat-empty .suggested-prompt-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.chat-empty .suggested-prompt-text {
+  color: inherit;
+  line-height: 1.4;
+}
+
+/* Composer pinned to the bottom */
+.runner-input-area {
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.runner-input-area .runner-textarea {
+  min-height: 56px;
+  max-height: 160px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.runner-input-area .runner-textarea:focus {
+  border-color: #a5b4fc;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.runner-btn-row {
+  margin: 0;
+  gap: 8px;
+}
+
+.runner-format {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.runner-format select {
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.runner-format select:focus-visible {
+  outline: none;
+  border-color: #a5b4fc;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.runner-btn-row .run-prompt-btn {
+  flex: none;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: #4f46e5;
+  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.3);
+}
+
+.runner-btn-row .run-prompt-btn:hover:not(:disabled) {
+  background: #4338ca;
+  transform: none;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+.runner-btn-row .run-prompt-btn.running {
+  background: #dc2626;
+  box-shadow: none;
+}
+
+.run-prompt-kbd {
+  font-family: inherit;
+  font-size: 11px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Docs tab ─────────────────────────────────────────────────────────────── */
+.docs-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 10px;
+  min-height: 0;
+  padding: 12px 14px;
+}
+
+.docs-panel--empty {
+  justify-content: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.docs-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.docs-toolbar-hint {
+  min-width: 0;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.docs-toolbar-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.docs-btn {
+  padding: 4px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+}
+
+.docs-btn:hover:not(:disabled) {
+  border-color: #c7d2fe;
+  background: #f5f7ff;
+}
+
+.docs-btn:disabled {
+  color: #94a3b8;
+  cursor: default;
+}
+
+.docs-btn--primary {
+  border-color: #4f46e5;
+  background: #4f46e5;
+  color: #ffffff;
+}
+
+.docs-btn--primary:hover:not(:disabled) {
+  border-color: #4338ca;
+  background: #4338ca;
+}
+
+.docs-btn--primary:disabled {
+  border-color: #c7d2fe;
+  background: #c7d2fe;
+  color: #ffffff;
+}
+
+.docs-note,
+.docs-error {
+  margin: 0;
+  font-size: 12px;
+}
+
+.docs-note { color: #64748b; }
+.docs-error { color: #dc2626; }
+
+.docs-editor {
+  flex: 1;
+  min-height: 320px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #1e293b;
+  resize: none;
+}
+
+.docs-editor:focus {
+  outline: none;
+  border-color: #a5b4fc;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.docs-rendered {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #1e293b;
+}
+
+.docs-empty {
+  margin: auto 0;
+  padding: 16px 4px;
+}
+
+.docs-empty-title {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.docs-empty-sub {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.docs-empty-actions {
+  display: flex;
+  gap: 8px;
+}

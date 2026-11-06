@@ -1,0 +1,49 @@
+{
+  "source": "synthetic: written from the provider's API reference; replace with a recording when one exists",
+  "note": "HTTP 400 before any output",
+  "providers": {
+    "anthropic": "claude-haiku-5-5"
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be brief."
+      },
+      {
+        "role": "user",
+        "content": "Say hello."
+      }
+    ],
+    "max_tokens": 64
+  },
+  "responses": {
+    "stream": {
+      "status": 400,
+      "body": {
+        "type": "error",
+        "error": {
+          "type": "invalid_request_error",
+          "message": "max_tokens: 100000 > 64000, which is the maximum allowed"
+        }
+      }
+    },
+    "complete": {
+      "status": 400,
+      "body": {
+        "type": "error",
+        "error": {
+          "type": "invalid_request_error",
+          "message": "max_tokens: 100000 > 64000, which is the maximum allowed"
+        }
+      }
+    }
+  },
+  "expect": {
+    "error": {
+      "status": 400,
+      "retryable": false,
+      "message_contains": "max_tokens: 100000 > 64000, wh"
+    }
+  }
+}
