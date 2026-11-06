@@ -59,6 +59,7 @@ AUDITED: Dict[Tuple[str, str], str] = {
     ("DELETE", "/api/iam/acls/{acl_id}"): "acl.delete",
     ("POST", "/api/apps/{app_id}/publish"): "app.publish",
     ("POST", "/api/apps/{app_id}/edit"): "app.unpublish",
+    ("PUT", "/api/apps/{app_id}/rename"): "app.rename",
     ("PUT", "/api/apps/{app_id}/publish-gate"): "publish_gate.update",
     ("DELETE", "/api/apps/{app_id}/publish-gate"): "publish_gate.delete",
     ("DELETE", "/api/apps/{app_id}"): "app.delete",

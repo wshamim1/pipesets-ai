@@ -183,6 +183,8 @@ The UI has seven areas: **Apps, Build, Evaluate, Monitor, Automation, Marketplac
 | Storage | SQLite by default, or any SQLAlchemy database. pgvector for vectors. |
 | Packaging | Docker/Podman images, Compose, Kubernetes (Kustomize) |
 
+For how each part works inside, see [docs/architecture](docs/architecture/README.md).
+
 ## Repository layout
 
 ```
@@ -598,6 +600,7 @@ docker compose up -d --build     # or: podman compose up -d --build
 | Document | Contents |
 |---|---|
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Container, Compose and Kubernetes deployment |
+| [docs/architecture](docs/architecture/README.md) | How the system is built: backend, run engine, LLM gateway, tools and RAG, security model, background jobs, storage, observability, frontend, deployment topologies |
 | [sdk/README.md](sdk/README.md) | SDK, CLI and MCP server reference |
 | [docs/guide](docs/guide/README.md) | User guide: building pipelines, tools, MCP, custom tools, agents, workflows, skills, RAG, guardrails, evals, monitoring, automation, sharing, settings, document extraction. Also in the app: **Docs** in the top bar |
 

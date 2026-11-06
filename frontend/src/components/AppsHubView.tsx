@@ -20,6 +20,7 @@ interface Props {
   onOpenApp: (app: AppRecord) => void
   onCreateApp: (name: string, description: string, flowData?: AppRecord['flow_data']) => Promise<any>
   onDeleteApp: (appId: string) => Promise<any>
+  onRenameApp: (app: AppRecord) => void | Promise<void>
   onRefreshApps: () => void
 }
 
@@ -35,6 +36,7 @@ export function AppsHubView({
   onOpenApp,
   onCreateApp,
   onDeleteApp,
+  onRenameApp,
   onRefreshApps,
 }: Props) {
   const [searchTerm, setSearchTerm] = useState('')
@@ -630,6 +632,25 @@ export function AppsHubView({
                         🛒 Share
                       </button>
                     )}
+                    <button
+                      type="button"
+                      title="Rename Application"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        void onRenameApp(app)
+                      }}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: 4,
+                        border: '1px solid #e2e8f0',
+                        background: '#ffffff',
+                        fontSize: 11,
+                        cursor: 'pointer',
+                        color: '#475569',
+                      }}
+                    >
+                      ✏️ Rename
+                    </button>
                     <button
                       type="button"
                       title="Duplicate / Fork Application"

@@ -7,12 +7,13 @@ interface Props {
   onOpenApp: (app: AppRecord) => void
   onManageApps: () => void
   onNewApp: () => void
+  onRenameApp?: (app: AppRecord) => void
 }
 
 const RECENT_LIMIT = 6
 
 /** App name in the canvas header, doubling as the switcher: recent apps, all apps, new app. */
-export function AppSwitcher({ currentApp, apps, onOpenApp, onManageApps, onNewApp }: Props) {
+export function AppSwitcher({ currentApp, apps, onOpenApp, onManageApps, onNewApp, onRenameApp }: Props) {
   const [open, setOpen] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
 
@@ -68,6 +69,11 @@ export function AppSwitcher({ currentApp, apps, onOpenApp, onManageApps, onNewAp
             </button>
           ))}
           <div className="app-switcher-sep" />
+          {currentApp && onRenameApp && (
+            <button type="button" role="menuitem" className="app-switcher-item" onClick={choose(() => onRenameApp(currentApp))}>
+              Rename “{currentApp.name}”…
+            </button>
+          )}
           <button type="button" role="menuitem" className="app-switcher-item" onClick={choose(onManageApps)}>
             All apps…
           </button>

@@ -108,3 +108,19 @@ def test_marketplace_carries_docs(client, P, I, app):
     assert client.get(f"/api/marketplace/listings/{listing_id}", headers=I).json()["docs"] == "# v1 docs, edited"
     imported = client.post(f"/api/marketplace/listings/{listing_id}/import", json={}, headers=I).json()
     assert client.get(f"/api/apps/{imported['app_id']}", headers=I).json()["docs"] == "# v1 docs, edited"
+
+
+def test_rename_draft_and_published(client, P, I):
+    app = client.post("/api/apps", json={"name": "Old name", "flow_data": FLOW}, headers=P).json()
+    r = client.put(f"/api/apps/{app['id']}/rename", json={"name": "  New name  "}, headers=P)
+    assert r.status_code == 200 and r.json()["name"] == "New name"
+
+    client.post(f"/api/apps/{app['id']}/publish", headers=P)
+    r = client.put(f"/api/apps/{app['id']}/rename", json={"name": "Published rename"}, headers=P)
+    assert r.status_code == 200, "renaming doesn't need a new draft"
+    assert r.json()["status"] == "published" and r.json()["version"] == 1
+    assert client.get(f"/api/apps/{app['id']}/versions/1", headers=P).json()["name"] == "New name", \
+        "the published version keeps its snapshot"
+
+    assert client.put(f"/api/apps/{app['id']}/rename", json={"name": "   "}, headers=P).status_code == 422
+    assert client.put(f"/api/apps/{app['id']}/rename", json={"name": "x"}, headers=I).status_code == 404

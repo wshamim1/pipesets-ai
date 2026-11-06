@@ -206,6 +206,28 @@ export function useAppManager(
     } catch { /* ignore */ }
   }, [currentApp])
 
+  /** Rename an app (draft or published). Returns an error message, or null on success. */
+  const renameApp = useCallback(async (appId: string, name: string): Promise<string | null> => {
+    const trimmed = name.trim()
+    if (!trimmed) return "Name can't be empty"
+    try {
+      const res = await fetch(`${API_BASE}/api/apps/${appId}/rename`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmed }),
+      })
+      if (!res.ok) return await saveErrorMessage(res, 'Could not rename the app')
+      const updated: AppRecord = await res.json()
+      setSavedAppsList((prev) => prev.map((a) => (a.id === updated.id ? { ...a, name: updated.name, updated_at: updated.updated_at } : a)))
+      // Keep the open canvas's unsaved flow: only take the new name
+      setCurrentApp((prev) => (prev?.id === updated.id ? { ...prev, name: updated.name, updated_at: updated.updated_at } : prev))
+      refreshPublishedApps()
+      return null
+    } catch {
+      return 'Offline – could not rename the app'
+    }
+  }, [])
+
   const deleteApp = useCallback(async (appId: string) => {
     try {
       await fetch(`${API_BASE}/api/apps/${appId}`, { method: 'DELETE' })
@@ -233,6 +255,7 @@ export function useAppManager(
     saveCurrentApp,
     publishApp,
     startEditing,
+    renameApp,
     deleteApp,
   }
 }

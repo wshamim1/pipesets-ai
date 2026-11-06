@@ -20,6 +20,10 @@ Thumbs.db
 *.log
 logs/
 
+# --- Runtime state from start.sh ---
+*.pid
+.backend_requirements.sha256
+
 # --- Local databases / runtime data ---
 *.db
 *.db-journal

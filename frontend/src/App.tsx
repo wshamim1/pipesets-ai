@@ -183,8 +183,15 @@ function FlowBuilder() {
   // ── App persistence ────────────────────────────────────────────────────────
   const {
     currentApp, setCurrentApp, savedAppsList, setSavedAppsList,
-    appSaveStatus, loadApp, createApp, saveCurrentApp, publishApp, startEditing, deleteApp,
+    appSaveStatus, loadApp, createApp, saveCurrentApp, publishApp, startEditing, renameApp, deleteApp,
   } = useAppManager(loadFlow, nodes, edges, setNodes, setEdges, setSelectedNodeId, getProviderKeys)
+
+  const promptRenameApp = useCallback(async (app: AppRecord) => {
+    const next = window.prompt('Rename pipeline', app.name)
+    if (next === null || !next.trim() || next.trim() === app.name) return
+    const error = await renameApp(app.id, next)
+    if (error) window.alert(error)
+  }, [renameApp])
 
   // ── Sidebar accordion + search state ──────────────────────────────────────
   const sidebar = useSidebarState()
@@ -1586,6 +1593,7 @@ function FlowBuilder() {
         }}
         onCreateApp={createApp}
         onDeleteApp={deleteApp}
+        onRenameApp={promptRenameApp}
         onRefreshApps={() => {
           catalog.bootFetch((apps: AppRecord[]) => {
             setSavedAppsList(apps)
@@ -1749,6 +1757,7 @@ function FlowBuilder() {
                 onOpenApp={loadApp}
                 onManageApps={() => setIsAppModalOpen(true)}
                 onNewApp={() => setIsNewAppModalOpen(true)}
+                onRenameApp={promptRenameApp}
               />
               <span className="node-counter">{nodes.length} node{nodes.length === 1 ? '' : 's'}</span>
               {activeNode && (
@@ -2291,6 +2300,7 @@ function FlowBuilder() {
                     </div>
                     <div className="app-item-actions" onClick={(e) => e.stopPropagation()}>
                       <button type="button" className="load-app-btn" onClick={() => loadApp(app)}>Open</button>
+                      <button type="button" className="load-app-btn" onClick={() => void promptRenameApp(app)}>Rename</button>
                       <button type="button" className="delete-app-btn" onClick={() => deleteApp(app.id)}>Delete</button>
                     </div>
                   </div>
