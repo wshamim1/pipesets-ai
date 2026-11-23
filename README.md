@@ -49,8 +49,8 @@ The first start creates the database and a demo workspace with sample data. See
   shareable chat links, and pipelines that call other pipelines.
 - **No lock-in:** 19 model providers through its own gateway, local models (Ollama, llama.cpp),
   and exports to LangChain, CrewAI, AutoGen, notebooks or Docker.
-- **Ready for teams:** single sign-on (OIDC and SAML) with group-to-role mapping, multi-tenant access
-  control, an encrypted secrets vault, guardrails,
+- **Ready for teams:** single sign-on (OIDC and SAML) with group-to-role mapping, SCIM provisioning,
+  audit log streaming to Splunk / Datadog / webhooks, multi-tenant access control, an encrypted secrets vault, guardrails,
   budgets and an append-only audit log.
 - **Self-hosted your way:** one script locally, Docker or Podman Compose, Kubernetes, or a
   desktop app.
@@ -459,6 +459,11 @@ take their host or account and token from the node (use a secret).
   Single sign-on**. IdP groups or roles map to tenant roles and groups, and are re-applied at each
   sign-in. Accounts can be created on first sign-in, and SSO can be required for members. See the
   [user guide](docs/guide/11-settings-admin.md#single-sign-on-sso).
+- **SCIM 2.0:** an IdP can provision users and groups at `/scim/v2`, with a per-provider bearer
+  token. Groups map to roles, and deactivating someone at the IdP ends their access immediately.
+- **Audit streaming:** the audit log can be streamed to a webhook (HMAC-signed), Splunk HEC or
+  Datadog, in order and with retries
+  ([guide](docs/guide/11-settings-admin.md#audit-log-streaming)).
 - API keys act as the user who created them, so ACLs, budgets and middleware still apply.
 - API keys are never accepted as UI sessions, and session tokens are never accepted on `/v1`.
 
@@ -702,9 +707,10 @@ docker compose up -d --build     # or: podman compose up -d --build
   assigns it with `python manage.py connections --assign CONN_ID --project PROJECT_ID`. The
   migration logs how many were left hidden.
 - **Single sign-on:** SAML responses must be signed, with SHA-256 or stronger. Encrypted
-  assertions, IdP-initiated sign-in, single logout and SCIM provisioning aren't supported yet.
-  Removing someone at the IdP takes effect at their next sign-in. Existing sessions run until they
-  expire (`AUTH_SESSION_TTL_HOURS`) unless an owner removes the member.
+  assertions, IdP-initiated sign-in and single logout aren't supported yet. Without SCIM,
+  removing someone at the IdP takes effect at their next sign-in. SCIM supports Users and Groups
+  with the filters and patch operations Okta and Entra ID send. Bulk operations, sorting and
+  ETags aren't supported.
 - **Alerts:** delivered on a best-effort basis to Slack or a JSON webhook, without retries. There
   is no email alert channel yet.
 - **CORS:** only the origins in `CORS_ORIGINS` may call the backend from a browser (default: the

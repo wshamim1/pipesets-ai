@@ -9,6 +9,13 @@ GET /api/audit-log/export   — every entry matching the same filters, as CSV or
                               (?format=csv|jsonl); the export itself is logged as audit.export
 GET /api/audit-log/policy   — retention period (set by the operator) and the action names
 
+Streaming (services/audit_stream.py; needs ``audit:admin``, which tenant owners have):
+GET    /api/audit-log/sinks              — where this workspace's log is streamed, with delivery status
+POST   /api/audit-log/sinks              — add a webhook / Splunk HEC / Datadog sink (start: now | all)
+PATCH  /api/audit-log/sinks/{sink_id}    — rename, change URL / token, pause or resume
+DELETE /api/audit-log/sinks/{sink_id}
+POST   /api/audit-log/sinks/{sink_id}/test — send one test event
+
 Requires the ``audit:read`` ACL (tenant owners have it implicitly). There is no route to change
 or delete entries; only the retention purge removes them.
 """
@@ -19,10 +26,11 @@ import json
 from datetime import datetime
 from typing import Iterator, Literal, Optional
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 
-from services import audit
+from services import audit, audit_stream
 from services.acl import require_access
 from services.request_context import get_request_context
 
@@ -97,3 +105,72 @@ def export_audit_log(request: Request, format: Literal["csv", "jsonl"] = "csv",
         "Content-Disposition": f'attachment; filename="audit-log-{ctx.tenant_id}-{stamp}.{format}"',
         "Cache-Control": "no-store",
     })
+
+
+# ── Streaming ─────────────────────────────────────────────────────────────────
+
+class SinkCreate(BaseModel):
+    name: str = Field(default="", max_length=200)
+    kind: str = Field(..., max_length=32)
+    url: str = Field(default="", max_length=2000)
+    token: str = Field(default="", max_length=2000)
+    start: Literal["now", "all"] = "now"
+
+
+class SinkUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, max_length=200)
+    url: Optional[str] = Field(default=None, max_length=2000)
+    token: Optional[str] = Field(default=None, max_length=2000)
+    enabled: Optional[bool] = None
+
+
+def _admin(request: Request):
+    ctx = get_request_context(request)
+    require_access(ctx, "audit", "admin")
+    return ctx
+
+
+@router.get("/sinks")
+def list_sinks(request: Request):
+    ctx = _admin(request)
+    return {"sinks": audit_stream.list_sinks(ctx.tenant_id), "kinds": audit_stream.KINDS,
+            "interval_seconds": audit_stream.interval()}
+
+
+@router.post("/sinks", status_code=201)
+def create_sink(req: SinkCreate, request: Request):
+    ctx = _admin(request)
+    try:
+        return audit_stream.create_sink(ctx.tenant_id, ctx.user_id, req.name, req.kind, req.url, req.token, req.start)
+    except audit_stream.SinkError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.patch("/sinks/{sink_id}")
+def update_sink(sink_id: str, req: SinkUpdate, request: Request):
+    ctx = _admin(request)
+    try:
+        sink = audit_stream.update_sink(sink_id, ctx.tenant_id, req.name, req.url, req.token, req.enabled)
+    except audit_stream.SinkError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if not sink:
+        raise HTTPException(status_code=404, detail="Sink not found")
+    return sink
+
+
+@router.delete("/sinks/{sink_id}")
+def delete_sink(sink_id: str, request: Request):
+    ctx = _admin(request)
+    if not audit_stream.delete_sink(sink_id, ctx.tenant_id):
+        raise HTTPException(status_code=404, detail="Sink not found")
+    return {"deleted": True, "id": sink_id}
+
+
+@router.post("/sinks/{sink_id}/test")
+async def test_sink(sink_id: str, request: Request):
+    from starlette.concurrency import run_in_threadpool
+    ctx = await run_in_threadpool(_admin, request)
+    try:
+        return await audit_stream.send_test(sink_id, ctx.tenant_id, ctx.user_id)
+    except LookupError:
+        raise HTTPException(status_code=404, detail="Sink not found")

@@ -60,6 +60,11 @@ AUDITED: Dict[Tuple[str, str], str] = {
     ("POST", "/api/iam/sso"): "sso_provider.create",
     ("PUT", "/api/iam/sso/{provider_id}"): "sso_provider.update",
     ("DELETE", "/api/iam/sso/{provider_id}"): "sso_provider.delete",
+    ("POST", "/api/iam/sso/{provider_id}/scim-token"): "scim.token_issue",
+    ("DELETE", "/api/iam/sso/{provider_id}/scim-token"): "scim.token_revoke",
+    ("POST", "/api/audit-log/sinks"): "audit_sink.create",
+    ("PATCH", "/api/audit-log/sinks/{sink_id}"): "audit_sink.update",
+    ("DELETE", "/api/audit-log/sinks/{sink_id}"): "audit_sink.delete",
     ("POST", "/api/apps/{app_id}/publish"): "app.publish",
     ("POST", "/api/apps/{app_id}/edit"): "app.unpublish",
     ("PUT", "/api/apps/{app_id}/rename"): "app.rename",
@@ -143,6 +148,7 @@ AUDITED: Dict[Tuple[str, str], str] = {
 NOT_AUDITED = {
     ("POST", "/api/iam/access-check"),
     ("POST", "/api/iam/sso/{provider_id}/test"),
+    ("POST", "/api/audit-log/sinks/{sink_id}/test"),
     ("POST", "/api/llm-settings/{provider}/test"),
     ("POST", "/api/webhooks/{webhook_id}/test"),
     ("POST", "/api/notifications/{channel_id}/test"),
@@ -168,12 +174,13 @@ NOT_AUDITED = {
 AUDITED_PREFIXES = ("/api/api-keys", "/api/secrets", "/api/iam", "/api/llm-settings", "/api/webhooks",
                     "/api/chat-links", "/api/reviews", "/api/notifications", "/api/connections", "/api/custom-tools", "/api/custom-mcp",
                     "/api/marketplace", "/api/budgets", "/api/middleware", "/api/schedules", "/api/system", "/api/admin",
-                    "/api/jobs", "/api/memory")
+                    "/api/jobs", "/api/memory", "/api/audit-log")
 
 # Written outside the route middleware: by this module, by SSO sign-in (sso.login, services/sso.py), and by the
 # MCP write tools (routers/v1_mcp.py),
 # which record app.create / app.update / app.publish under the key's owner, naming the key in ``path``
-SYSTEM_ACTIONS = ("audit.export", "audit.purge", "sso.login", "app.create", "app.update", "custom_tool.deploy",
+SYSTEM_ACTIONS = ("audit.export", "audit.purge", "sso.login", "scim.user_create", "scim.user_update",
+                  "scim.user_delete", "scim.group_create", "scim.group_update", "scim.group_delete", "app.create", "app.update", "custom_tool.deploy",
                   "custom_tool.rollback")
 
 MAX_CAPTURED_BODY = 64 * 1024

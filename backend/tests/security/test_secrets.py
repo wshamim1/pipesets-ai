@@ -280,10 +280,13 @@ def test_migration_0009_seals_legacy_plaintext():
     assert secret_store.plaintext_credentials(legacy) == []
     assert secret_store.unseal(legacy["nodes"][0]["data"]["api_key"]) == "sk-legacy-plain-5555"
     assert legacy["nodes"][0]["data"]["config"]["channel"] == "#x"
-    sealed_flow = column("apps", "flow_data", "app_legacy")
     downgrade_to("0008_llm_settings")
     migrate()
-    assert column("apps", "flow_data", "app_legacy") == sealed_flow, "re-running doesn't double-seal"
+    # Re-running seals nothing twice (0039's downgrade/upgrade re-encrypts, so compare plaintexts)
+    again = json.loads(column("apps", "flow_data", "app_legacy"))["nodes"][0]["data"]
+    assert secret_store.unseal(again["api_key"]) == "sk-legacy-plain-5555", "re-running doesn't double-seal"
+    assert secret_store.unseal(again["config"]["app_id"]) == "WOLF-1"
+    assert secret_store.sealed_tenant(again["api_key"]) == "tenant_demo", "0039 bound it to the app's tenant"
 
     db = get_db_connection()
     dump = "\n".join(str(v) for t in ("apps", "app_versions", "webhooks", "notification_channels", "connections")

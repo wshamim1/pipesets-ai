@@ -3,6 +3,7 @@ import { useTenantContext } from '../../context/TenantContext'
 import { IamAdminPanel } from '../ops/IamAdminPanel'
 import { ApiKeysPanel } from '../ops/ApiKeysPanel'
 import { AuditLogPanel } from '../ops/AuditLogPanel'
+import { AuditStreamsPanel } from '../ops/AuditStreamsPanel'
 import { GlobalAdminPanel } from '../ops/GlobalAdminPanel'
 import { AdminConsolePanel } from './AdminConsolePanel'
 import { DatabasePanel } from './DatabasePanel'
@@ -34,7 +35,7 @@ const SECTIONS: { heading: string; items: { id: SettingsTab; label: string; titl
       { id: 'workspaces', label: 'Workspaces & projects', title: 'Workspaces & projects', description: 'Workspaces (tenants) and the projects inside them that scope apps, runs and keys.' },
       { id: 'sso', label: 'Single sign-on', title: 'Single sign-on (SSO)', description: 'Let people sign in with their work account through OIDC or SAML (Okta, Entra ID, Google, Keycloak…), and map IdP groups to workspace roles and groups. Owners only.' },
       { id: 'apikeys', label: 'API keys', title: 'API keys', description: 'Keys that let external apps, scripts and MCP clients call your published pipelines through /v1.' },
-      { id: 'audit', label: 'Audit log', title: 'Audit log', description: 'Who changed keys, secrets, access, workspaces and publishing — and who was refused. Filter, page back, or export as CSV or JSON Lines.' },
+      { id: 'audit', label: 'Audit log', title: 'Audit log', description: 'Who changed keys, secrets, access, workspaces and publishing — and who was refused. Stream it to Splunk, Datadog or a webhook; filter, page back, or export as CSV or JSON Lines.' },
     ],
   },
   {
@@ -84,7 +85,7 @@ export function SettingsView({ tab, onTabChange, onPipelineDeleted, onPipelinesC
     case 'workspaces':   body = <IamAdminPanel section="workspaces" />; break
     case 'sso':          body = <SsoPanel />; break
     case 'apikeys':      body = <ApiKeysPanel />; break
-    case 'audit':        body = <AuditLogPanel />; break
+    case 'audit':        body = <><AuditStreamsPanel /><AuditLogPanel /></>; break
     case 'providerkeys': body = <ProviderKeysPanel />; break
     case 'backends':     body = <ModelBackendsPanel />; break
     case 'secrets':      body = <SecretsPanel />; break

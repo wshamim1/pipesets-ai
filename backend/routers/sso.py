@@ -15,6 +15,8 @@ POST   /api/iam/sso                 — add one
 PUT    /api/iam/sso/{provider_id}   — change one (an empty client secret keeps the saved one)
 DELETE /api/iam/sso/{provider_id}   — remove one (ends the sessions it created)
 POST   /api/iam/sso/{provider_id}/test — check the configuration (discovery / certificate)
+POST   /api/iam/sso/{provider_id}/scim-token — turn SCIM on, or rotate its token (shown once)
+DELETE /api/iam/sso/{provider_id}/scim-token — turn SCIM off (the IdP can no longer call /scim/v2)
 """
 
 import logging
@@ -27,7 +29,7 @@ from pydantic import BaseModel, Field
 
 from db import get_db_connection
 from routers.auth import session_response
-from services import sso, sso_oidc, sso_saml
+from services import scim, sso, sso_oidc, sso_saml
 from services.request_context import get_request_context
 
 log = logging.getLogger(__name__)
@@ -234,6 +236,26 @@ def delete_provider(provider_id: str, request: Request):
     if not sso.delete_provider(provider_id, ctx.tenant_id):
         raise HTTPException(status_code=404, detail="Identity provider not found")
     return {"deleted": True, "id": provider_id}
+
+
+@router.post("/{provider_id}/scim-token")
+def issue_scim_token(provider_id: str, request: Request):
+    ctx = _owner_ctx(request)
+    try:
+        token = scim.issue_token(provider_id, ctx.tenant_id)
+    except LookupError:
+        raise HTTPException(status_code=404, detail="Identity provider not found")
+    except sso.SSOError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"id": provider_id, "token": token, "base_url": sso.public_base(str(request.base_url)) + "/scim/v2"}
+
+
+@router.delete("/{provider_id}/scim-token")
+def revoke_scim_token(provider_id: str, request: Request):
+    ctx = _owner_ctx(request)
+    if not scim.revoke_token(provider_id, ctx.tenant_id):
+        raise HTTPException(status_code=404, detail="Identity provider not found")
+    return {"id": provider_id, "scim_enabled": False}
 
 
 @router.post("/{provider_id}/test")

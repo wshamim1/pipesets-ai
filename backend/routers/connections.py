@@ -84,21 +84,23 @@ _SENSITIVE_KEY = re.compile(
 )
 
 
-def _seal_config(config: Dict[str, Any], existing: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """Seal plaintext credential values; a blank one keeps the existing sealed value."""
+def _seal_config(config: Dict[str, Any], existing: Optional[Dict[str, Any]] = None,
+                 tenant_id: Optional[str] = None) -> Dict[str, Any]:
+    """Seal plaintext credential values (for ``tenant_id``, default the request's); a blank one keeps
+    the existing sealed value."""
     existing = existing or {}
     out: Dict[str, Any] = {}
     for key, value in config.items():
         if isinstance(value, dict):
             prev = existing.get(key)
-            out[key] = _seal_config(value, prev if isinstance(prev, dict) else None)
+            out[key] = _seal_config(value, prev if isinstance(prev, dict) else None, tenant_id)
         elif _SENSITIVE_KEY.search(key) and isinstance(value, str):
             if value == "" and secret_store.is_protected(existing.get(key)):
                 out[key] = existing[key]
             elif value == "" or secret_store.is_protected(value):
                 out[key] = value
             else:
-                out[key] = secret_store.seal(value)
+                out[key] = secret_store.seal(value, tenant_id)
         else:
             out[key] = value
     return out
@@ -108,6 +110,16 @@ def _plain_config(config: Dict[str, Any]) -> Dict[str, Any]:
     return secret_store.resolve_refs(config)
 
 
+async def _check(conn_type: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    """Health-check a (sealed) config. A credential that can't be opened here — another workspace's,
+    or from before per-workspace encryption — is reported as a failed check, not a server error."""
+    try:
+        plain = _plain_config(config)
+    except secret_store.SecretError as e:
+        return {"success": False, "status": "error", "message": str(e)}
+    return await test_connection_logic(conn_type, plain)
+
+
 def seal_plaintext_connections() -> int:
     """One-time upgrade: seal credentials saved in plaintext before sealing existed —
     in the connections table and in Connection nodes stored in apps / app versions.
@@ -115,15 +127,17 @@ def seal_plaintext_connections() -> int:
     changed = 0
     db = get_db_connection()
     try:
-        for row in db.execute("SELECT id, config FROM connections").fetchall():
+        for row in db.execute("SELECT id, config, tenant_id FROM connections").fetchall():
             cfg = json.loads(row["config"] or "{}")
-            sealed = _seal_config(cfg)
+            sealed = _seal_config(cfg, tenant_id=row["tenant_id"])
             if sealed != cfg:
                 db.execute("UPDATE connections SET config = ? WHERE id = ?", (json.dumps(sealed), row["id"]))
                 changed += 1
         for table in ("apps", "app_versions"):
-            key_cols = "id" if table == "apps" else "app_id, version"
-            for row in db.execute(f"SELECT {key_cols}, flow_data FROM {table}").fetchall():
+            sql = ("SELECT id, flow_data, tenant_id FROM apps" if table == "apps" else
+                   "SELECT v.app_id, v.version, v.flow_data, a.tenant_id FROM app_versions v "
+                   "LEFT JOIN apps a ON a.id = v.app_id")
+            for row in db.execute(sql).fetchall():
                 try:
                     flow = json.loads(row["flow_data"] or "{}")
                 except ValueError:
@@ -132,7 +146,7 @@ def seal_plaintext_connections() -> int:
                 for node in flow.get("nodes", []) if isinstance(flow, dict) else []:
                     data = node.get("data") if isinstance(node, dict) else None
                     if node.get("type") == "connection" and isinstance(data, dict) and isinstance(data.get("config"), dict):
-                        sealed = _seal_config(data["config"])
+                        sealed = _seal_config(data["config"], tenant_id=row["tenant_id"])
                         if sealed != data["config"]:
                             data["config"] = sealed
                             dirty = True
@@ -409,7 +423,7 @@ async def create_connection(req: ConnectionCreate, request: Request):
 
     # Test connection on create
     config = _seal_config(req.config)
-    test_res = await test_connection_logic(req.type, _plain_config(config))
+    test_res = await _check(req.type, config)
     status = test_res.get("status", "untested")
     status_msg = test_res.get("message", "")
 
@@ -464,7 +478,7 @@ async def update_connection(conn_id: str, req: ConnectionUpdate, request: Reques
     description = req.description if req.description is not None else existing["description"]
     config = _seal_config(req.config, existing["config"]) if req.config is not None else existing["config"]
 
-    test_res = await test_connection_logic(conn_type, _plain_config(config))
+    test_res = await _check(conn_type, config)
     status = test_res.get("status", existing["status"])
     status_msg = test_res.get("message", existing["status_msg"])
     now = datetime.utcnow().isoformat()
@@ -510,7 +524,7 @@ async def test_adhoc_connection(req: ConnectionTestRequest, request: Request):
     if req.connection_id and not existing:
         raise HTTPException(status_code=404, detail="Connection not found")
     config = _seal_config(req.config, existing["config"] if existing else None)
-    result = await test_connection_logic(req.type, _plain_config(config))
+    result = await _check(req.type, config)
     return result
 
 
@@ -522,7 +536,7 @@ async def test_saved_connection(conn_id: str, request: Request):
     if not conn:
         raise HTTPException(status_code=404, detail="Connection not found")
 
-    result = await test_connection_logic(conn["type"], _plain_config(conn["config"]))
+    result = await _check(conn["type"], conn["config"])
     status = result.get("status", "untested")
     status_msg = result.get("message", "")
     now = datetime.utcnow().isoformat()

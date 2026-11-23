@@ -130,8 +130,11 @@ def public_view(p: Dict[str, Any], request_base: str = "") -> Dict[str, Any]:
                              "role_mappings", "default_role", "auto_provision", "sync_roles", "enforce",
                              "created_at", "updated_at")}
     out["config"] = cfg
+    out["scim_enabled"] = bool(p.get("scim_token_hash"))
+    out["scim_token_prefix"] = p.get("scim_token_prefix") or None
     if request_base:
         base = public_base(request_base)
+        out["scim_base_url"] = f"{base}/scim/v2"
         if p["protocol"] == "oidc":
             out["redirect_uri"] = f"{base}/api/auth/sso/oidc/callback"
         else:
@@ -285,6 +288,11 @@ def delete_provider(provider_id: str, tenant_id: str) -> bool:
             return False
         conn.execute("DELETE FROM sso_identities WHERE provider_id = ?", (provider_id,))
         conn.execute("DELETE FROM sso_states WHERE provider_id = ?", (provider_id,))
+        # SCIM's records go with it; the memberships it created stay (an owner can remove people)
+        conn.execute("DELETE FROM scim_group_members WHERE group_id IN (SELECT id FROM scim_groups WHERE provider_id = ?)",
+                     (provider_id,))
+        conn.execute("DELETE FROM scim_groups WHERE provider_id = ?", (provider_id,))
+        conn.execute("DELETE FROM scim_users WHERE provider_id = ?", (provider_id,))
         # Sessions it created end with it
         conn.execute("UPDATE auth_sessions SET revoked_at = ? WHERE sso_provider_id = ? AND revoked_at IS NULL",
                      (_iso(), provider_id))
@@ -399,8 +407,7 @@ def complete_login(p: Dict[str, Any], *, subject: str, email: str, name: str = "
         raise SSOError(f"Emails at {domain} can't sign in with {p['name']}.")
 
     role, groups, managed = map_roles(p, claims)
-    if role is None:
-        raise SSOError("Your account isn't assigned to Pipesets in the identity provider. Ask your administrator.")
+    unassigned = "Your account isn't assigned to Pipesets in the identity provider. Ask your administrator."
 
     tenant_id, now = p["tenant_id"], _iso()
     conn = get_db_connection()
@@ -436,7 +443,19 @@ def complete_login(p: Dict[str, Any], *, subject: str, email: str, name: str = "
 
         current = conn.execute("SELECT role FROM tenant_memberships WHERE tenant_id = ? AND user_id = ?",
                                (tenant_id, user_id)).fetchone()
-        if not current:
+        # With SCIM on, the IdP provisions this workspace's members, their roles and groups (services/scim.py)
+        scim_row = conn.execute("SELECT s.active FROM scim_users s JOIN sso_providers p ON p.id = s.provider_id "
+                                "WHERE s.provider_id = ? AND s.user_id = ? AND p.scim_token_hash IS NOT NULL",
+                                (p["id"], user_id)).fetchone()
+        if scim_row is not None and not scim_row["active"]:
+            raise SSOError("Your organization has turned off your access to this workspace.")
+        if scim_row is not None:
+            if not current:
+                raise SSOError(unassigned)
+            groups, managed = [], []          # SCIM keeps roles and groups; nothing to sync from the claims
+        elif role is None:
+            raise SSOError(unassigned)
+        elif not current:
             if not p["auto_provision"]:
                 raise SSOError("Your account isn't a member of this workspace. Ask an owner to add you.")
             conn.execute("INSERT INTO tenant_memberships (tenant_id, user_id, role, created_at) VALUES (?, ?, ?, ?)",
@@ -451,7 +470,7 @@ def complete_login(p: Dict[str, Any], *, subject: str, email: str, name: str = "
                 conn.execute("UPDATE tenant_memberships SET role = ? WHERE tenant_id = ? AND user_id = ?",
                              (role, tenant_id, user_id))
 
-        if p["sync_roles"] or not current:
+        if scim_row is None and (p["sync_roles"] or not current):
             for gid in managed:
                 if gid not in groups:
                     conn.execute("DELETE FROM group_memberships WHERE group_id = ? AND user_id = ? AND tenant_id = ?",

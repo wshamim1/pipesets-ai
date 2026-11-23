@@ -134,7 +134,7 @@ _handlers: Dict[str, Handler] = {}
 # Modules that register handlers and periodic loops; a worker imports them so it knows every kind.
 HANDLER_MODULES = ("services.scheduler", "services.webhooks", "services.notifier", "services.gates",
                    "services.audit", "services.shared_state", "services.long_term_memory", "services.kv_store",
-                   "services.model_routing", "services.batches")
+                   "services.model_routing", "services.batches", "services.audit_stream")
 
 
 def handler(kind: str, max_attempts: Optional[int] = None, on_dead=None):

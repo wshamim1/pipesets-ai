@@ -336,7 +336,7 @@ def create_study(scope: RunScope, body: Dict[str, Any]) -> Dict[str, Any]:
     to the provider as the key."""
     import uuid
     request = {**body, "provider_keys": {
-        p.lower(): v if secret_store.is_protected(v) else secret_store.seal(v)
+        p.lower(): v if secret_store.is_protected(v) else secret_store.seal(v, scope.tenant_id)
         for p, v in (body.get("provider_keys") or {}).items() if v}}
     study_id = f"opt_{uuid.uuid4().hex}"
     now = _now()

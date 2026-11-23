@@ -72,6 +72,13 @@ The vault is [services/secret_store.py](../../backend/services/secret_store.py).
   server just before the tool or model runs. It never appears in a saved flow, an export or the
   browser. Connection credentials, webhook signing secrets and notification URLs are stored
   sealed inline (`enc://…`).
+- **Sealed values are bound to their workspace.** The tenant ID is encrypted together with each
+  sealed value, so it can't be swapped. Where configs and flows are decrypted for a run
+  (`resolve_refs`), a value only opens in the workspace it was sealed for, and only inside a
+  signed-in request or a pipeline run. A credential copied out of one workspace is useless in
+  another, whether it came from an export, an old API response or a backup. Values sealed before
+  binding existed are refused too; migration `0039` bound every stored value to its owner.
+  Rotation (`rotate-secrets`) keeps the binding.
 - **Refused saves.** `PUT /api/apps/{id}` rejects a flow with a plaintext credential in a known
   key field.
 - **Kinds.** An `llm` secret can reach only model and embedding calls, and a `tool` secret can
@@ -88,6 +95,12 @@ streaming runs too, and can retract a response mid-stream. Budgets (`services/bu
 warn when spending reaches a limit, globally or per app.
 
 ## Audit log
+
+Workspaces can stream their log to a SIEM (`services/audit_stream.py`): a webhook signed with
+HMAC-SHA256, Splunk HEC or Datadog. Each destination keeps a cursor (the last entry delivered),
+so delivery is ordered and at-least-once, and an outage only delays it. SCIM provisioning
+(`services/scim.py`, a per-provider bearer token stored as SHA-256) can only change membership in
+its own workspace, only for emails at the provider's domains. It never disables a global account.
 
 `services/audit.py` records admin actions to an append-only `audit_log` table:
 

@@ -171,6 +171,8 @@ def _purge_scope(conn, tenant_id: str, project_id: Optional[str] = None) -> Dict
     database cascades the rest (memberships, groups, projects, ACLs) when the parent goes."""
     removed = {}
     if not project_id:   # SSO links and pending sign-ins hang off the workspace's identity providers
+        conn.execute("DELETE FROM scim_group_members WHERE group_id IN "
+                     "(SELECT id FROM scim_groups WHERE tenant_id = ?)", (tenant_id,))
         for table in ("sso_identities", "sso_states"):
             n = conn.execute(f"DELETE FROM {table} WHERE provider_id IN "
                              "(SELECT id FROM sso_providers WHERE tenant_id = ?)", (tenant_id,)).rowcount

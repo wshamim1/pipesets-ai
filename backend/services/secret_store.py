@@ -26,6 +26,14 @@ credentials: the ciphertext itself travels in the config (opaque to the browser)
 decrypted at the same point refs are resolved, without a lookup. Webhook signing secrets
 and notification channel URLs are stored sealed too.
 
+A sealed value is bound to the tenant it was sealed for: the tenant id is encrypted together
+with the value (``_BIND``), so it can't be swapped. ``resolve_refs`` — where values from configs
+and flows, which users can copy, are decrypted — only opens a value bound to the current run's
+tenant. A credential copied out of one workspace (an export, an old API response, a backup) is
+useless in another. Values sealed before binding existed are refused there too; migration 0039
+bound every stored one. Server-owned columns (webhook secrets, channel URLs, OAuth tokens, chat
+link tokens) are read with ``unseal``, which doesn't check the binding.
+
 Saved flows may hold credentials only as refs or sealed values: ``plaintext_credentials``
 lists the offending fields so the apps API can refuse the save.
 """
@@ -273,16 +281,75 @@ def rotate_all() -> int:
 
 # ── Sealed (inline-encrypted) values ──────────────────────────────────────────
 
-def seal(value: str) -> str:
-    return SEALED_PREFIX + encrypt(value)
+# Inside the ciphertext: _BIND + tenant id + NUL + value. NUL never appears in a credential typed into a form.
+_BIND = "\x00pst1\x00"
+
+
+class WrongTenantError(SecretError):
+    """A sealed value bound to another tenant (or to none) used where the binding is checked."""
+
+
+def seal(value: str, tenant_id: Optional[str] = None) -> str:
+    """Encrypt ``value`` bound to ``tenant_id`` — by default the tenant of the request or run in progress.
+    Outside any (startup, public routes) the value is unbound, which ``resolve_refs`` refuses: pass the
+    tenant explicitly when sealing something a pipeline will use."""
+    if tenant_id is None:
+        scope = _current_scope()
+        tenant_id = scope[0] if scope else None
+    return SEALED_PREFIX + encrypt(f"{_BIND}{tenant_id}\x00{value}" if tenant_id else value)
 
 
 def is_sealed(value: Any) -> bool:
     return isinstance(value, str) and value.startswith(SEALED_PREFIX) and len(value) > len(SEALED_PREFIX)
 
 
+def _open(value: str) -> Tuple[Optional[str], str]:
+    """(bound tenant or None, plaintext)."""
+    plain = decrypt(value[len(SEALED_PREFIX):])
+    if plain.startswith(_BIND):
+        tenant, _, rest = plain[len(_BIND):].partition("\x00")
+        return tenant, rest
+    return None, plain
+
+
 def unseal(value: str) -> str:
-    return decrypt(value[len(SEALED_PREFIX):])
+    """Plaintext of a sealed value, whatever tenant it is bound to — for server-owned columns."""
+    return _open(value)[1]
+
+
+def sealed_tenant(value: str) -> Optional[str]:
+    """The tenant a sealed value is bound to, or None for a value sealed before binding existed."""
+    return _open(value)[0]
+
+
+def unseal_for(value: str, tenant_id: Optional[str]) -> str:
+    """Plaintext of a sealed value from a config or flow, only if it is bound to ``tenant_id``."""
+    bound, plain = _open(value)
+    if bound is None:
+        raise WrongTenantError("A saved credential predates per-workspace encryption and can't be used. "
+                               "Enter it again (or pick the saved connection again) and save.")
+    if not tenant_id or bound != tenant_id:
+        raise WrongTenantError("A saved credential belongs to another workspace and can't be used here. "
+                               "Enter it again in this workspace.")
+    return plain
+
+
+def rebind(value: Any, tenant_id: str) -> Tuple[Any, int]:
+    """``value`` (a JSON tree) with every sealed string re-sealed for ``tenant_id``. Returns it and how
+    many changed. For migrations and for moving a connection to a workspace."""
+    if is_sealed(value):
+        bound, plain = _open(value)
+        return (value, 0) if bound == tenant_id else (seal(plain, tenant_id), 1)
+    if isinstance(value, dict):
+        out, n = {}, 0
+        for k, v in value.items():
+            out[k], c = rebind(v, tenant_id)
+            n += c
+        return out, n
+    if isinstance(value, list):
+        pairs = [rebind(v, tenant_id) for v in value]
+        return [v for v, _ in pairs], sum(c for _, c in pairs)
+    return value, 0
 
 
 def is_protected(value: Any) -> bool:
@@ -344,12 +411,13 @@ def plaintext_credentials(flow: Any) -> List[str]:
             for node in _flow_nodes(flow) for _, _, path in _plaintext_fields(node["data"])]
 
 
-def seal_flow_credentials(flow: Any) -> int:
-    """Seal, in place, every plaintext credential in a flow's nodes. Returns how many."""
+def seal_flow_credentials(flow: Any, tenant_id: Optional[str] = None) -> int:
+    """Seal, in place, every plaintext credential in a flow's nodes (for ``tenant_id``, default the
+    current one). Returns how many."""
     count = 0
     for node in _flow_nodes(flow):
         for container, key, _ in list(_plaintext_fields(node["data"])):
-            container[key] = seal(container[key].strip())
+            container[key] = seal(container[key].strip(), tenant_id)
             count += 1
     return count
 
@@ -402,13 +470,13 @@ def resolve_refs(config: Dict[str, Any], purpose: str = "tool") -> Dict[str, Any
     values = list(_walk(config))
     if not any(is_protected(v) for v in values):
         return config
-    scope = _current_scope() if any(is_ref(v) for v in values) else None
-    if scope is None and any(is_ref(v) for v in values):
+    scope = _current_scope()
+    if scope is None:
         raise SecretError("Secrets can only be used inside a signed-in request or pipeline run.")
 
     def sub(value: Any) -> Any:
         if is_sealed(value):
-            return unseal(value)
+            return unseal_for(value, scope[0])
         if is_ref(value):
             return _reveal(_REF_RE.match(value).group(1), scope, purpose)  # type: ignore[union-attr,arg-type]
         if isinstance(value, dict):

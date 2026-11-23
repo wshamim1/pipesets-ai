@@ -139,11 +139,15 @@ def test_migration_backfill(tmp_path):
 def test_manage_lists_and_assigns_unscoped(client, A, capsys):
     import manage
     with db_conn() as c:
+        from services import secret_store
         c.execute("INSERT INTO connections (id, name, type, config, created_at, updated_at) "
-                  "VALUES ('conn_orphan', 'Orphan DB', 'custom_api', '{}', 'x', 'x')")
+                  "VALUES ('conn_orphan', 'Orphan DB', 'custom_api', ?, 'x', 'x')",
+                  (json.dumps({"api_key": secret_store.seal("orphan-key", "")}),))
         c.commit()
     assert manage.main(["connections"]) == 0 and "conn_orphan" in capsys.readouterr().out
     assert manage.main(["connections", "--assign", "conn_orphan"]) == 1          # --project required
     assert manage.main(["connections", "--assign", "conn_orphan", "--project", A["x-project-id"]]) == 0
-    assert "conn_orphan" in [c["id"] for c in client.get("/api/connections", headers=A).json()]
+    moved = next(c for c in client.get("/api/connections", headers=A).json() if c["id"] == "conn_orphan")
+    from services import secret_store
+    assert secret_store.sealed_tenant(moved["config"]["api_key"]) == A["x-tenant-id"], "credentials re-bound"
     assert manage.main(["connections", "--assign", "conn_orphan", "--project", A["x-project-id"]]) == 1  # now scoped

@@ -20,3 +20,8 @@
 .sso-upload { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .sso-upload small { color: #64748b; font-size: 12px; flex: 1; min-width: 240px; }
 .sso-upload-btn { cursor: pointer; white-space: nowrap; }
+.sso-scim { border-top: 1px solid #e5e7eb; padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.sso-scim-head { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #0f172a; }
+.sso-scim small { color: #64748b; font-size: 12px; }
+.sso-scim-token { border: 1px solid #86efac; background: #f0fdf4; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #166534; }
+.audit-streams { margin-bottom: 16px; }

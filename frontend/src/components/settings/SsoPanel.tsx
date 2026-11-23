@@ -24,6 +24,9 @@ type Provider = {
   sp_entity_id?: string
   acs_url?: string
   metadata_url?: string
+  scim_enabled?: boolean
+  scim_token_prefix?: string | null
+  scim_base_url?: string
 }
 
 type Draft = Omit<Provider, 'id' | 'config' | 'email_domains'> & { id?: string; config: Record<string, string>; domains: string }
@@ -85,6 +88,8 @@ export function SsoPanel() {
   const [notice, setNotice] = useState('')
   const [draft, setDraft] = useState<Draft | null>(null)
   const [saving, setSaving] = useState(false)
+  // A just-issued SCIM token, shown once
+  const [scimToken, setScimToken] = useState<{ providerId: string; token: string; baseUrl: string } | null>(null)
 
   const load = useCallback(async () => {
     const res = await fetch(`${API_BASE}/api/iam/sso`)
@@ -163,6 +168,30 @@ export function SsoPanel() {
       setNotice(`${p.name}: ${body.detail}`)
     } else {
       setError(`${p.name}: ${body.detail}`)
+    }
+  }
+
+  const issueScim = async (p: Provider) => {
+    if (p.scim_enabled && !window.confirm(`Replace ${p.name}'s SCIM token? The identity provider stops syncing until you paste the new one.`)) return
+    const res = await fetch(`${API_BASE}/api/iam/sso/${p.id}/scim-token`, { method: 'POST' })
+    if (!res.ok) {
+      setError(await detail(res))
+      return
+    }
+    const body = await res.json()
+    setError('')
+    setNotice('')
+    setScimToken({ providerId: p.id, token: body.token, baseUrl: body.base_url })
+    load()
+  }
+
+  const revokeScim = async (p: Provider) => {
+    if (!window.confirm(`Turn off SCIM for ${p.name}? The identity provider can no longer add or remove people. People already provisioned keep their access.`)) return
+    const res = await fetch(`${API_BASE}/api/iam/sso/${p.id}/scim-token`, { method: 'DELETE' })
+    if (!res.ok) setError(await detail(res))
+    else {
+      setScimToken(null)
+      load()
     }
   }
 
@@ -342,6 +371,33 @@ export function SsoPanel() {
             <CopyRow label="Redirect URI" value={p.redirect_uri} />
             <CopyRow label="SP entity ID / metadata" value={p.sp_entity_id} />
             <CopyRow label="ACS URL" value={p.acs_url} />
+            <div className="sso-scim">
+              <div className="sso-scim-head">
+                <strong>SCIM provisioning</strong>
+                <span className="ops-count-badge">{p.scim_enabled ? `On · ${p.scim_token_prefix}…` : 'Off'}</span>
+                <div className="sso-card-buttons">
+                  <button type="button" className="ops-refresh-btn" onClick={() => issueScim(p)}>
+                    {p.scim_enabled ? 'Rotate token' : 'Turn on SCIM'}
+                  </button>
+                  {p.scim_enabled && (
+                    <button type="button" className="ops-link-btn" onClick={() => revokeScim(p)}>Turn off</button>
+                  )}
+                </div>
+              </div>
+              <small>
+                Your IdP adds, updates and removes people automatically. Its groups map to roles through the table above,
+                and turning someone off at the IdP ends their access here at once.
+                {!p.email_domains.length && ' Set email domains first.'}
+              </small>
+              {scimToken?.providerId === p.id && (
+                <div className="sso-scim-token" role="status">
+                  <strong>Copy the token now: it won't be shown again.</strong>
+                  <CopyRow label="SCIM base URL" value={scimToken.baseUrl} />
+                  <CopyRow label="Bearer token" value={scimToken.token} />
+                </div>
+              )}
+              {p.scim_enabled && !scimToken && <CopyRow label="SCIM base URL" value={p.scim_base_url} />}
+            </div>
           </div>
         ))}
       </div>

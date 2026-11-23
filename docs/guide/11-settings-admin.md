@@ -6,9 +6,9 @@ Open **Settings** with the ⚙ gear in the top bar.
 |---|---|
 | **Members & access** | Invite users, set roles, manage groups and access rules |
 | **Workspaces & projects** | Create workspaces (tenants) and projects; switch between them in the top bar |
-| **Single sign-on** | Sign in with Okta, Entra ID, Google, Keycloak… (OIDC or SAML); map IdP groups to roles (owners only) |
+| **Single sign-on** | Sign in with Okta, Entra ID, Google, Keycloak… (OIDC or SAML); map IdP groups to roles; SCIM provisioning (owners only) |
 | **API keys** | Keys for `/v1`, MCP and the SDK ([Share](10-share-integrate.md#rest-api-v1)) |
-| **Audit log** | Who changed what: keys, secrets, members, publishing, chat links, review decisions; export it |
+| **Audit log** | Who changed what: keys, secrets, members, publishing, chat links, review decisions; export it or stream it to Splunk, Datadog or a webhook |
 | **Tools & MCP packages** | Install the built-in tools and MCP servers the builder's sidebar offers |
 | **Model provider keys** | A default key per model provider for the project |
 | **Model backends** | Which gateway engine sends calls for each provider, and its base URL |
@@ -83,6 +83,26 @@ changes to providers. Removing a provider signs out everyone who signed in with 
 **Require SSO.** With this on, members can't open the workspace with a password session. Owners
 still can, so a broken IdP can't lock everyone out.
 
+**SCIM provisioning.** On a provider's card, **Turn on SCIM** gives you a **SCIM base URL** and a
+**bearer token**. The token is shown once; copy it then. Paste both into the IdP's provisioning
+settings: Okta's "SCIM 2.0 Test App (OAuth Bearer Token)", or Entra ID's Enterprise application →
+Provisioning. From then on, the IdP adds, updates and removes people automatically:
+
+- **Groups decide roles.** The IdP's groups go through the same role mapping table: a group whose
+  name matches a mapping gives that role and Pipesets group. A person in no mapped group gets the
+  default role, or no access if you chose "Refuse".
+- **Turning someone off at the IdP** (deactivating, unassigning or deleting them) removes them from
+  this workspace and ends their SSO sessions at once. Their account itself stays, in case they
+  belong to other workspaces. The workspace's last owner is never removed.
+- **SCIM is the source of truth.** For people SCIM manages, sign-in no longer changes roles from
+  the token's claims, and a deactivated person can't sign in.
+- **Email domains are required.** SCIM can only provision emails at the provider's email domains,
+  so set those first.
+
+**Rotate token** replaces the token: paste the new one into the IdP. **Turn off** stops
+provisioning; people already provisioned keep their access. Every SCIM change is in the audit log
+as `scim.*`.
+
 **Behind a proxy:**
 
 - Set `PIPESETS_PUBLIC_URL` to the backend's public address. The redirect URI, ACS URL and SP
@@ -90,6 +110,30 @@ still can, so a broken IdP can't lock everyone out.
 - Set `PIPESETS_APP_URL` when the UI is on a different address.
 - An IdP on a private network must be listed in `EXTERNAL_AGENT_ALLOWED_HOSTS`, because Pipesets
   only fetches discovery and keys from public addresses unless told otherwise.
+
+## Audit log streaming
+
+**Settings → Audit log → Streaming** sends every audit entry to your own systems as it happens.
+That includes sign-ins (`sso.login`), SCIM changes, access changes, keys, secrets and publishing.
+
+| Destination | What to enter |
+|---|---|
+| **Webhook (JSON)** | An HTTPS URL. With a signing secret, each batch carries `X-Pipesets-Signature: sha256=<HMAC-SHA256 of the body>` |
+| **Splunk HEC** | The HTTP Event Collector URL (`…/services/collector/event`) and a HEC token. Events use sourcetype `pipesets:audit` |
+| **Datadog Logs** | Your site's intake URL (empty for US1) and an API key. Logs use source `pipesets` and a `tenant:` tag |
+
+- **Ordered and never lost.** Entries are sent in order, in batches, within a few seconds. If the
+  destination is down, delivery stops where it was and retries with growing pauses, up to an
+  hour, so an outage loses nothing. A failing destination shows its last error. Use **Retry now**
+  after fixing it.
+- **Duplicates are possible.** Rarely, after a timeout, an entry is sent twice, so de-duplicate on
+  its `id`.
+- **Start from:** choose **New entries only** or **Everything still in the log** (a backfill).
+  **Test** sends one `audit_sink.test` event without affecting the stream.
+- **Who can set it up:** workspace owners, or anyone with the `audit:admin` permission. URLs and
+  tokens are stored encrypted.
+- **Private networks:** a destination there, such as an internal Splunk, must be listed in
+  `EXTERNAL_AGENT_ALLOWED_HOSTS`.
 
 ## Tools & MCP packages
 

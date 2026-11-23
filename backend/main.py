@@ -19,7 +19,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from db import init_db
 from models import make_default_config
 from version import APP_VERSION
-from routers import apps, tools, memory, cache, run, export, stream, retrieval, agents, custom_tools, custom_mcp, connections, knowledge_base, traces, eval as eval_router, build, iam, lab, skills, middleware as middleware_router, budgets, pipelines, workflows, api_keys, v1, auth as auth_router, marketplace, schedules, webhooks, notifications, secrets as secrets_router, llm_settings as llm_settings_router, audit_log, system, jobs as jobs_router, metrics as metrics_router, dev_tunnel, v1_mcp, v1_tools, chat_links, reviews, feedback as feedback_router, batches, saved_agents, agent_catalog, release_notes, about, admin, sso as sso_router
+from routers import apps, tools, memory, cache, run, export, stream, retrieval, agents, custom_tools, custom_mcp, connections, knowledge_base, traces, eval as eval_router, build, iam, lab, skills, middleware as middleware_router, budgets, pipelines, workflows, api_keys, v1, auth as auth_router, marketplace, schedules, webhooks, notifications, secrets as secrets_router, llm_settings as llm_settings_router, audit_log, system, jobs as jobs_router, metrics as metrics_router, dev_tunnel, v1_mcp, v1_tools, chat_links, reviews, feedback as feedback_router, batches, saved_agents, agent_catalog, release_notes, about, admin, sso as sso_router, scim as scim_router
 from services import jobs, log_redaction, telemetry
 from services.request_context import bind_secret_scope, get_current_user
 from services.audit import AuditMiddleware
@@ -114,6 +114,7 @@ def metrics(request: Request):
 # ── Routers ───────────────────────────────────────────────────────────────────
 # Public: sign-up/login, /v1 (authenticates with its own API keys) and /v1/hooks (the URL token is the credential)
 app.include_router(auth_router.router)
+app.include_router(scim_router.router)   # /scim/v2: provisioning from an IdP (its SCIM bearer token)
 app.include_router(sso_router.public_router)   # /api/auth/sso: SSO sign-in (single-use state / handoff code is the credential)
 app.include_router(v1.router)
 app.include_router(v1_mcp.router)   # /v1/mcp: the same API as a remote MCP server

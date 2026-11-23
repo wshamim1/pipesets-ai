@@ -64,9 +64,12 @@ def connections_command(assign, all_unscoped, project_id) -> int:
         if assign and assign not in {r["id"] for r in rows}:
             print(f"{assign} is not an unscoped connection (scoped ones are moved by their workspace)", file=sys.stderr)
             return 1
+        import json
         for cid in ids:
-            conn.execute("UPDATE connections SET tenant_id = ?, project_id = ? WHERE id = ?",
-                         (proj["tenant_id"], project_id, cid))
+            cfg = json.loads(conn.execute("SELECT config FROM connections WHERE id = ?", (cid,)).fetchone()[0] or "{}")
+            cfg, _ = secret_store.rebind(cfg, proj["tenant_id"])   # its credentials now open only there
+            conn.execute("UPDATE connections SET tenant_id = ?, project_id = ?, config = ? WHERE id = ?",
+                         (proj["tenant_id"], project_id, json.dumps(cfg), cid))
         conn.commit()
         print(f"Assigned {len(ids)} connection(s) to {proj['tenant_id']}/{project_id}.")
         return 0
