@@ -5,7 +5,7 @@
 export const TOP_VIEWS = ['apps', 'build', 'evaluate', 'monitor', 'automation', 'marketplace', 'lab', 'settings', 'docs'] as const
 export const MONITOR_TABS = ['metrics', 'runs', 'traces', 'logs', 'costs', 'sessions'] as const
 export const AUTOMATION_TABS = ['schedules', 'webhooks', 'batches', 'alerts', 'jobs'] as const
-export const SETTINGS_TABS = ['members', 'workspaces', 'apikeys', 'audit', 'providerkeys', 'backends', 'secrets', 'packages', 'agents', 'admin', 'database', 'tunnel', 'system', 'danger'] as const
+export const SETTINGS_TABS = ['members', 'workspaces', 'sso', 'apikeys', 'audit', 'providerkeys', 'backends', 'secrets', 'packages', 'agents', 'admin', 'database', 'tunnel', 'system', 'danger'] as const
 export const RIGHT_PANEL_TABS = ['run', 'overview', 'docs', 'schedules', 'webhooks'] as const
 
 export type TopView = typeof TOP_VIEWS[number]

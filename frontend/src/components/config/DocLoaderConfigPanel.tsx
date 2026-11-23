@@ -375,6 +375,36 @@ export function DocLoaderConfigPanel({ activeNode, nodes, edges, onUpdate, onDel
         </div>
       )}
 
+      {data.loader_type === 'okf' && (
+        <div className="config-card">
+          <h4 className="card-heading">Knowledge trust (OKF)<HelpLink page="06-knowledge-rag" section="okf-bundles" label="OKF bundles" /></h4>
+          <div className="form-group">
+            <label className="field-label">Lowest trust to load</label>
+            <select className="field-select" value={data.okf_min_trust ?? 'any'} disabled={readOnly}
+              onChange={(e) => onUpdate(activeNode.id, { okf_min_trust: e.target.value })}>
+              <option value="any">Any — include unverified concepts</option>
+              <option value="machine">Machine-verified or better</option>
+              <option value="human">Human-reviewed only</option>
+            </select>
+            <span className="field-hint">Derived from each concept's <code>verified</code> entries.</span>
+          </div>
+          <div className="form-group">
+            <label className="field-label">
+              <input type="checkbox" checked={data.okf_include_stale ?? true} disabled={readOnly}
+                onChange={(e) => onUpdate(activeNode.id, { okf_include_stale: e.target.checked })} />{' '}
+              Include stale concepts (past <code>stale_after</code>; tagged STALE)
+            </label>
+          </div>
+          <div className="form-group">
+            <label className="field-label">
+              <input type="checkbox" checked={data.okf_include_deprecated ?? false} disabled={readOnly}
+                onChange={(e) => onUpdate(activeNode.id, { okf_include_deprecated: e.target.checked })} />{' '}
+              Include deprecated concepts
+            </label>
+          </div>
+        </div>
+      )}
+
       <div className="config-card">
         <h4 className="card-heading">3. Chunk Strategy</h4>
         <div className="form-group">

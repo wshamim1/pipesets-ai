@@ -71,7 +71,7 @@ def _package_ids() -> List[str]:
 def list_packages(request: Request):
     ctx = get_request_context(request)
     require_access(ctx, "tools", "read")
-    return {"can_edit": has_access(ctx, "tools", "write"), "can_reload": is_server_admin(ctx.user_id),
+    return {"can_edit": has_access(ctx, "tools", "write"), "can_reload": not ctx.sso_tenant and is_server_admin(ctx.user_id),
             "packages": tool_packages.describe(ctx.tenant_id, _package_ids())}
 
 

@@ -51,6 +51,8 @@ class SessionUser:
     user_id: str
     email: str
     display_name: str
+    # Set on sessions created by single sign-on: the only tenant the session reaches (services/sso.py)
+    sso_tenant: Optional[str] = None
 
 
 def session_ttl() -> timedelta:
@@ -124,16 +126,19 @@ def set_password(user_id: str, password: str) -> None:
 
 # ── Sessions ──────────────────────────────────────────────────────────────────
 
-def create_session(user_id: str, user_agent: str = "") -> Tuple[str, Dict[str, Any]]:
+def create_session(user_id: str, user_agent: str = "", tenant_id: Optional[str] = None,
+                   sso_provider_id: Optional[str] = None) -> Tuple[str, Dict[str, Any]]:
+    """A new session. ``tenant_id`` scopes it to one tenant (SSO sessions; see services/sso.py)."""
     token = TOKEN_PREFIX + secrets.token_urlsafe(32)
     now = datetime.utcnow()
     expires_at = (now + session_ttl()).isoformat()
     session_id = f"sess_{uuid.uuid4().hex[:12]}"
     with _db() as conn:
         conn.execute(
-            "INSERT INTO auth_sessions (id, user_id, token_hash, user_agent, created_at, last_seen_at, expires_at) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (session_id, user_id, _hash_token(token), user_agent[:200], now.isoformat(), now.isoformat(), expires_at),
+            "INSERT INTO auth_sessions (id, user_id, token_hash, user_agent, created_at, last_seen_at, expires_at, "
+            "tenant_id, sso_provider_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (session_id, user_id, _hash_token(token), user_agent[:200], now.isoformat(), now.isoformat(), expires_at,
+             tenant_id, sso_provider_id),
         )
         conn.commit()
     return token, {"id": session_id, "expires_at": expires_at}
@@ -154,7 +159,8 @@ def resolve_session(token: str) -> Optional[SessionUser]:
     with _db() as conn:
         row = conn.execute(
             """
-            SELECT s.id AS session_id, s.expires_at, u.id AS user_id, u.email, u.display_name
+            SELECT s.id AS session_id, s.expires_at, s.tenant_id AS sso_tenant, u.id AS user_id, u.email,
+                   u.display_name
             FROM auth_sessions s JOIN users u ON u.id = s.user_id
             WHERE s.token_hash = ? AND s.revoked_at IS NULL AND u.status = 'active'
             """,
@@ -164,7 +170,7 @@ def resolve_session(token: str) -> Optional[SessionUser]:
             return None
         conn.execute("UPDATE auth_sessions SET last_seen_at = ? WHERE id = ?", (now, row["session_id"]))
         conn.commit()
-    return SessionUser(row["session_id"], row["user_id"], row["email"], row["display_name"])
+    return SessionUser(row["session_id"], row["user_id"], row["email"], row["display_name"], row["sso_tenant"])
 
 
 def revoke_session(session_id: str) -> None:
@@ -302,8 +308,18 @@ def signup(email: str, password: str, display_name: str, workspace_name: Optiona
     return {"user_id": user_id, "tenant_id": tenant_id, "project_id": project_id}
 
 
-def memberships(user_id: str) -> List[Dict[str, Any]]:
-    """Tenants the user belongs to, with their role and the tenant's projects."""
+def tenant_allowed(conn, tenant_id: str, role: str, sso_tenant: Optional[str]) -> bool:
+    """Whether a session may open a tenant the user belongs to: an SSO session only its own tenant; a
+    password session any tenant except those that enforce SSO, where only owners may (break-glass)."""
+    if sso_tenant:
+        return tenant_id == sso_tenant
+    from services.sso import enforced_tenants  # lazy: services.sso imports db helpers only
+
+    return role == "owner" or tenant_id not in enforced_tenants(conn)
+
+
+def memberships(user_id: str, sso_tenant: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Tenants the user belongs to and the session may open, with their role and the tenant's projects."""
     with _db() as conn:
         tenants = conn.execute(
             """
@@ -316,6 +332,8 @@ def memberships(user_id: str) -> List[Dict[str, Any]]:
         ).fetchall()
         result = []
         for t in tenants:
+            if not tenant_allowed(conn, t["id"], t["role"], sso_tenant):
+                continue
             projects = conn.execute(
                 "SELECT id, name, status FROM projects WHERE tenant_id = ? ORDER BY created_at ASC", (t["id"],)
             ).fetchall()

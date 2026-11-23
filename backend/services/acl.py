@@ -66,5 +66,5 @@ def require_server_admin(ctx: RequestContext) -> None:
     """Server-wide settings (the database) need a server admin, not just a workspace owner."""
     from services.auth import is_server_admin  # lazy: services.auth imports request_context too
 
-    if not is_server_admin(ctx.user_id):
+    if ctx.sso_tenant or not is_server_admin(ctx.user_id):
         raise HTTPException(status_code=403, detail="Only a server admin can do this.")

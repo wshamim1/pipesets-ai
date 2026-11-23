@@ -49,7 +49,8 @@ The first start creates the database and a demo workspace with sample data. See
   shareable chat links, and pipelines that call other pipelines.
 - **No lock-in:** 19 model providers through its own gateway, local models (Ollama, llama.cpp),
   and exports to LangChain, CrewAI, AutoGen, notebooks or Docker.
-- **Ready for teams:** multi-tenant access control, an encrypted secrets vault, guardrails,
+- **Ready for teams:** single sign-on (OIDC and SAML) with group-to-role mapping, multi-tenant access
+  control, an encrypted secrets vault, guardrails,
   budgets and an append-only audit log.
 - **Self-hosted your way:** one script locally, Docker or Podman Compose, Kubernetes, or a
   desktop app.
@@ -88,7 +89,7 @@ The first start creates the database and a demo workspace with sample data. See
 | LLM providers / models | 19 / 73 |
 | Built-in tools | 209 |
 | Built-in MCP servers | 110 |
-| Document loaders | 22 built, 93 planned |
+| Document loaders | 23 built, 93 planned |
 | Canvas node types | 25 |
 | Automated tests | 1,807 backend (pytest) and 303 frontend (Vitest) |
 
@@ -411,7 +412,8 @@ All backend settings are environment variables, read from `backend/.env`. See
 | `WEBHOOK_MAX_INFLIGHT` / `WEBHOOK_MAX_BODY_BYTES` | `5` / `262144` | Per-webhook concurrency (more calls get 429) and body size limit |
 | `SANDBOX_REQUIRE_ISOLATION` | `0` | `1` means custom tools fail instead of running unsandboxed when no container engine is available |
 | `EXTERNAL_AGENT_ALLOW_PRIVATE` / `EXTERNAL_AGENT_ALLOWED_HOSTS` | `0` / empty | SSRF guard for external child agents and remote MCP servers |
-| `PIPESETS_PUBLIC_URL` | the request's own URL | Public base URL of the backend, e.g. `https://pipesets.example.com`. MCP OAuth sign-in redirects back to `<it>/api/custom-mcp/oauth/callback`; set it behind a proxy |
+| `PIPESETS_PUBLIC_URL` | the request's own URL | Public base URL of the backend, e.g. `https://pipesets.example.com`. MCP OAuth sign-in redirects back to `<it>/api/custom-mcp/oauth/callback`, and SSO's redirect URI, ACS URL and SP entity ID are built from it; set it behind a proxy |
+| `PIPESETS_APP_URL` | `PIPESETS_PUBLIC_URL` | Where the UI is, if not at `PIPESETS_PUBLIC_URL`. Single sign-on returns the browser here |
 | `MARKETPLACE_TRY_SERVER_KEYS` | | Allows "try" runs in the Marketplace to use the server's provider keys |
 
 **Observability and alerts**
@@ -446,13 +448,17 @@ take their host or account and token from the node (use a secret).
 
 | Surface | Credential | Notes |
 |---|---|---|
-| `/api/*` (UI and internal) | Session token from `/api/auth/login` | Brute-force throttled. Changing a password ends all of that user's sessions. |
+| `/api/*` (UI and internal) | Session token from `/api/auth/login` or single sign-on | Brute-force throttled. Changing a password ends all of that user's sessions. An SSO session reaches only the workspace whose identity provider signed the user in. |
 | `/v1/*` (public API) | `Authorization: Bearer ps_…` API key | Scopes `apps:read` and `apps:run`. Per-key rate limit (default 60 rpm) and optional expiry. Only the SHA-256 hash is stored. |
 | `/v1/hooks/{token}` | Secret URL token, optional HMAC | Token is shown once and stored hashed. Signature header is `X-Hub-Signature-256` or `X-Pipesets-Signature`. |
 | `/v1/chat/{token}` | Secret URL token (the chat link) | Public: anyone with the link. Stored hashed, plus an encrypted copy so the builder can copy the link again. Runs act as the link's creator. Passcode and sign-in links are planned. |
 
 - **Tenant roles:** `owner`, `editor`, `viewer`. Groups and per-resource ACLs narrow access
   within a tenant.
+- **Single sign-on:** workspace owners add OIDC or SAML 2.0 identity providers in **Settings →
+  Single sign-on**. IdP groups or roles map to tenant roles and groups, and are re-applied at each
+  sign-in. Accounts can be created on first sign-in, and SSO can be required for members. See the
+  [user guide](docs/guide/11-settings-admin.md#single-sign-on-sso).
 - API keys act as the user who created them, so ACLs, budgets and middleware still apply.
 - API keys are never accepted as UI sessions, and session tokens are never accepted on `/v1`.
 
@@ -690,6 +696,10 @@ docker compose up -d --build     # or: podman compose up -d --build
   ("Update successful") reward a model that only claims it. Each option runs once, so on a small
   dataset one unlucky answer can reject a good model; set a tolerance. Nodes inside called pipelines
   are tried but not changed by **Apply to draft**: edit and re-publish those pipelines.
+- **Single sign-on:** SAML responses must be signed, with SHA-256 or stronger. Encrypted
+  assertions, IdP-initiated sign-in, single logout and SCIM provisioning aren't supported yet.
+  Removing someone at the IdP takes effect at their next sign-in. Existing sessions run until they
+  expire (`AUTH_SESSION_TTL_HOURS`) unless an owner removes the member.
 - **Alerts:** delivered on a best-effort basis to Slack or a JSON webhook, without retries. There
   is no email alert channel yet.
 - **CORS:** only the origins in `CORS_ORIGINS` may call the backend from a browser (default: the

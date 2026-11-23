@@ -233,6 +233,7 @@ certifi==2026.10.23 \
     #   httpcore
     #   httpx
     #   requests
+    #   signxml
 cffi==2.1.1 \
     --hash=sha256:046bfc24911b37851ee1b51aab8bffe713d89c68c6a057b09484ce9fd5f69b4e \
     --hash=sha256:06c72bb76605a4b0cd0aad6930b69d4baf7dd5d806cfc409b824191099700e66 \
@@ -588,7 +589,10 @@ cryptography==50.0.2 \
     --hash=sha256:f9f6143a8c75945eb960d9eb98905a441394abfa24afaae239d514ffb2586480 \
     --hash=sha256:fa8f5efb344d6908a1ce62f4a24e2e5780f825d6f53f5f50ec5ffacac72936cb \
     --hash=sha256:fdd28f912fccfec1846a94e2e1e8f9b0012f557f0c46fe4f3eb0d7a87afcf90b
-    # via -r requirements.txt
+    # via
+    #   -r requirements.txt
+    #   pyjwt
+    #   signxml
 ddgs==9.16.1 \
     --hash=sha256:0cde5682e5801b838915bcb1d12ade8f2e1ec11763b88d0035a1faa0662b517a \
     --hash=sha256:9ac0b3c19d865a9bfbf7bc7cc8090bd43d1e7adfb083a017bbece360a22e21b6
@@ -1343,6 +1347,7 @@ lxml==6.1.3 \
     #   doclang
     #   python-docx
     #   python-pptx
+    #   signxml
 mail-parser==4.9.0 \
     --hash=sha256:4911053276f4078c60959135c77b58e308f4acf78ec5ac7366117aa60dc74a97 \
     --hash=sha256:6a0ab360e1f4fa0d06aa6ec5cf6855f98ff881adeb3d56d82f99f85a8484b7fb
@@ -2516,6 +2521,10 @@ pygments==2.21.0 \
     # via
     #   mpire
     #   rich
+pyjwt==2.15.1 \
+    --hash=sha256:42d59d631f7768a1028a64c7ff581a9bf7519804daf91fc5b6c56e30eec5e193 \
+    --hash=sha256:4f259e80cdfb6b3fc18a7de51fd1ef9ec79652f25019bae68975ca2468a34df8
+    # via -r requirements.txt
 pylatexenc==2.11 \
     --hash=sha256:305a072a99ce736246049c9da05841b9d718c0f7ea8888f5f596cf15cb621053 \
     --hash=sha256:e78e7391d6c104f1ed150e21cfaa58016cdb50aa54406a2eecb793649ffdfdd0
@@ -3145,6 +3154,10 @@ shellingham==1.5.4 \
     --hash=sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686 \
     --hash=sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de
     # via typer
+signxml==5.3.1 \
+    --hash=sha256:01ca1d5b7d5829d1622ae3a7ce3d312d3fb28a67297d79c0cfa662fb80a722c8 \
+    --hash=sha256:c45457cd97b3ce52f7342c6f8f049cebe0b8bba69d8fa84da0e7ef5701c9d14f
+    # via -r requirements.txt
 six==1.17.0 \
     --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
     --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81

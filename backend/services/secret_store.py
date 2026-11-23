@@ -247,7 +247,8 @@ def rotate_all() -> int:
                          (_cipher().rotate(r["ciphertext"].encode("ascii")).decode("ascii"), r["id"]))
         count = len(rows)
         # (table, JSON column, key columns)
-        for table, col, keys in (("connections", "config", ("id",)), ("apps", "flow_data", ("id",)),
+        for table, col, keys in (("connections", "config", ("id",)), ("sso_providers", "config", ("id",)),
+                                 ("apps", "flow_data", ("id",)),
                                  ("app_versions", "flow_data", ("app_id", "version"))):
             for r in conn.execute(f"SELECT {', '.join(keys)}, {col} FROM {table}").fetchall():
                 try:
@@ -260,7 +261,7 @@ def rotate_all() -> int:
                                  (json.dumps(rotated), *(r[k] for k in keys)))
                     count += n
         for table, col in (("webhooks", "secret"), ("notification_channels", "url"), ("custom_mcp_servers", "oauth"),
-                           ("chat_links", "token_sealed")):
+                           ("chat_links", "token_sealed"), ("sso_states", "data")):
             for r in conn.execute(f"SELECT id, {col} FROM {table} WHERE {col} LIKE 'enc://%'").fetchall():
                 conn.execute(f"UPDATE {table} SET {col} = ? WHERE id = ?", (_rotate_sealed_tree(r[col])[0], r["id"]))
                 count += 1

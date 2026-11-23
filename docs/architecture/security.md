@@ -13,6 +13,7 @@ another tenant returns 404, not 403, so its existence isn't revealed.
 | Caller | Credential | Where checked |
 |---|---|---|
 | UI user | Session token `uas_…` in `Authorization: Bearer` or `X-Session-Token` | `services/auth.py` |
+| UI user via SSO | The same session token, scoped to one tenant, issued after an OIDC or SAML sign-in | `services/sso.py`, `sso_oidc.py`, `sso_saml.py` |
 | Code, CLI, MCP client | API key `ps_…` with scopes, rate limit and expiry | `services/api_keys.py` |
 | Webhook caller | Secret URL token, plus an optional HMAC-SHA256 signature of the body | `services/webhooks.py` |
 | Chat-link visitor | The link token, with per-link rate limits | `services/chat_links.py` |
@@ -25,6 +26,22 @@ another tenant returns 404, not 403, so its existence isn't revealed.
   logout, on a password change, or when the user is disabled.
 - API keys only work on `/v1` and are never accepted as sessions. A key acts as the user who
   created it.
+- **Single sign-on.** An IdP's assertion becomes a session only after full verification:
+  - OIDC: the ID token's signature is checked against the IdP's JWKS, with asymmetric algorithms
+    only. Issuer, audience/azp, expiry, nonce and PKCE are all checked, and so is
+    `email_verified`.
+  - SAML: signxml checks the signature against the pinned IdP certificate. Only the signed
+    element is read, which defeats assertion wrapping. Issuer, InResponseTo, Recipient,
+    Destination, Audience and the validity window are all checked.
+
+  Sign-in state and the UI handoff code are single-use, short-lived and sealed in `sso_states`.
+  The session token never appears in a URL. `return_to` must be a known UI origin, so the flow
+  can't be used as an open redirect.
+- **SSO sessions are scoped.** `auth_sessions.tenant_id` limits a session to the tenant of the
+  provider that issued it. `request_context` refuses other tenants, and `acl.require_server_admin`
+  refuses server-admin actions. A workspace owner controls their own IdP, so they can never vouch
+  for access beyond their workspace. When a workspace requires SSO, password sessions of its
+  non-owner members can't open it.
 - `AUTH_MODE=headers` is a legacy development mode that trusts `x-user-id`. Never use it on a
   shared server.
 

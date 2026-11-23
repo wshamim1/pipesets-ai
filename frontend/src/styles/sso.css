@@ -1,0 +1,22 @@
+/* Settings → Single sign-on (components/settings/SsoPanel.tsx); reuses the API keys panel's look */
+.sso-body { display: flex; flex-direction: column; padding: 14px 16px; gap: 12px; overflow-y: auto; min-height: 0; }
+.sso-error { color: #dc2626; font-size: 12px; background: #fff5f5; border: 1px solid #fecaca; border-radius: 6px; padding: 8px 10px; }
+.sso-notice { color: #166534; font-size: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 8px 10px; }
+.sso-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.sso-card h3 { margin: 0; font-size: 14px; color: #0f172a; }
+.sso-card h4 { margin: 6px 0 0; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; }
+.sso-card-head { display: flex; align-items: center; gap: 8px; }
+.sso-card-buttons { margin-left: auto; display: flex; gap: 6px; }
+.sso-meta { font-size: 12px; color: #64748b; }
+.sso-field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #334155; }
+.sso-field > span { font-weight: 600; }
+.sso-field small { color: #64748b; }
+.sso-check { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: #334155; }
+.sso-mappings { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.sso-mapping { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto; gap: 6px; width: 100%; }
+.sso-actions { display: flex; gap: 10px; align-items: center; }
+.sso-copy-row { display: grid; grid-template-columns: 170px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 12px; color: #475569; }
+.sso-copy-row code { font-family: monospace; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 5px 8px; overflow-x: auto; white-space: nowrap; user-select: all; }
+.sso-upload { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sso-upload small { color: #64748b; font-size: 12px; flex: 1; min-width: 240px; }
+.sso-upload-btn { cursor: pointer; white-space: nowrap; }

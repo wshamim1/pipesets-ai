@@ -57,6 +57,9 @@ AUDITED: Dict[Tuple[str, str], str] = {
     ("POST", "/api/iam/acls"): "acl.create",
     ("PUT", "/api/iam/acls/{acl_id}"): "acl.update",
     ("DELETE", "/api/iam/acls/{acl_id}"): "acl.delete",
+    ("POST", "/api/iam/sso"): "sso_provider.create",
+    ("PUT", "/api/iam/sso/{provider_id}"): "sso_provider.update",
+    ("DELETE", "/api/iam/sso/{provider_id}"): "sso_provider.delete",
     ("POST", "/api/apps/{app_id}/publish"): "app.publish",
     ("POST", "/api/apps/{app_id}/edit"): "app.unpublish",
     ("PUT", "/api/apps/{app_id}/rename"): "app.rename",
@@ -139,6 +142,7 @@ AUDITED: Dict[Tuple[str, str], str] = {
 # previews, executions and checks.
 NOT_AUDITED = {
     ("POST", "/api/iam/access-check"),
+    ("POST", "/api/iam/sso/{provider_id}/test"),
     ("POST", "/api/llm-settings/{provider}/test"),
     ("POST", "/api/webhooks/{webhook_id}/test"),
     ("POST", "/api/notifications/{channel_id}/test"),
@@ -166,9 +170,10 @@ AUDITED_PREFIXES = ("/api/api-keys", "/api/secrets", "/api/iam", "/api/llm-setti
                     "/api/marketplace", "/api/budgets", "/api/middleware", "/api/schedules", "/api/system", "/api/admin",
                     "/api/jobs", "/api/memory")
 
-# Written outside the route middleware: by this module, and by the MCP write tools (routers/v1_mcp.py),
+# Written outside the route middleware: by this module, by SSO sign-in (sso.login, services/sso.py), and by the
+# MCP write tools (routers/v1_mcp.py),
 # which record app.create / app.update / app.publish under the key's owner, naming the key in ``path``
-SYSTEM_ACTIONS = ("audit.export", "audit.purge", "app.create", "app.update", "custom_tool.deploy",
+SYSTEM_ACTIONS = ("audit.export", "audit.purge", "sso.login", "app.create", "app.update", "custom_tool.deploy",
                   "custom_tool.rollback")
 
 MAX_CAPTURED_BODY = 64 * 1024

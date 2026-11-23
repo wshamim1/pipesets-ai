@@ -14,6 +14,9 @@ class RequestContext:
     tenant_id: str
     project_id: str
     user_id: str
+    # The tenant an SSO session is limited to (None for password sessions); such a session never has
+    # server-admin rights (services/acl.require_server_admin)
+    sso_tenant: Optional[str] = None
 
 
 def auth_mode() -> str:
@@ -40,6 +43,7 @@ def get_current_user(request: Request) -> str:
                                 headers={"WWW-Authenticate": "Bearer"})
         request.state.user_id = user.user_id
         request.state.session_id = user.session_id
+        request.state.sso_tenant = user.sso_tenant
         return user.user_id
 
     if auth_mode() == "headers":
@@ -72,23 +76,31 @@ def get_request_context(request: Request) -> RequestContext:
         request.state.ctx = ctx
         return ctx
 
+    sso_tenant: Optional[str] = getattr(request.state, "sso_tenant", None)
     conn = get_db_connection()
     try:
         if tenant_hdr:
             member = conn.execute(
-                "SELECT 1 FROM tenant_memberships WHERE tenant_id = ? AND user_id = ?", (tenant_hdr, user_id)
+                "SELECT role FROM tenant_memberships WHERE tenant_id = ? AND user_id = ?", (tenant_hdr, user_id)
             ).fetchone()
             if not member:
                 raise HTTPException(status_code=403, detail=f"You are not a member of tenant '{tenant_hdr}'.")
+            if not auth.tenant_allowed(conn, tenant_hdr, member[0], sso_tenant):
+                raise HTTPException(status_code=403, detail=(
+                    "This session was opened by another workspace's single sign-on. Sign in again for this one."
+                    if sso_tenant else "This workspace requires single sign-on. Sign in with SSO."))
             tenant_id = tenant_hdr
         else:
-            row = conn.execute(
-                "SELECT tenant_id FROM tenant_memberships WHERE user_id = ? ORDER BY created_at ASC LIMIT 1",
+            rows = conn.execute(
+                "SELECT tenant_id, role FROM tenant_memberships WHERE user_id = ? ORDER BY created_at ASC",
                 (user_id,),
-            ).fetchone()
-            if not row:
-                raise HTTPException(status_code=403, detail="Your account is not a member of any tenant.")
-            tenant_id = row[0]
+            ).fetchall()
+            allowed = [r[0] for r in rows if auth.tenant_allowed(conn, r[0], r[1], sso_tenant)]
+            if not allowed:
+                raise HTTPException(status_code=403, detail=(
+                    "This workspace requires single sign-on. Sign in with SSO." if rows
+                    else "Your account is not a member of any tenant."))
+            tenant_id = allowed[0]
 
         if project_hdr:
             if not conn.execute(
@@ -104,7 +116,7 @@ def get_request_context(request: Request) -> RequestContext:
     finally:
         conn.close()
 
-    ctx = RequestContext(tenant_id=tenant_id, project_id=project_id, user_id=user_id)
+    ctx = RequestContext(tenant_id=tenant_id, project_id=project_id, user_id=user_id, sso_tenant=sso_tenant)
     request.state.ctx = ctx
     return ctx
 

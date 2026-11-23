@@ -13,10 +13,10 @@ import loaders
 from helpers import hdr
 from loaders.base import LoaderError
 
-RUNNABLE = ["pdf", "text", "markdown", "csv", "json", "docx", "html", "directory", "excel", "web_url", "sitemap",
+RUNNABLE = ["okf", "pdf", "text", "markdown", "csv", "json", "docx", "html", "directory", "excel", "web_url", "sitemap",
             "rss", "wikipedia", "arxiv", "s3", "postgres", "mysql", "sql_database", "docling", "email", "yardi_export",
             "image"]
-CATALOG_SIZE = 115
+CATALOG_SIZE = 116
 
 
 def load(loader_type, source, cfg=None):
@@ -163,7 +163,7 @@ def test_ingest_endpoint(client, F, shop_db, monkeypatch):
     assert r.status_code == 200 and r.json()["documents_loaded"] == 2, r.text
 
 
-# ── Document extraction loaders (plan.md P1): Docling / OCR fallback, email, Yardi export ──────────
+# ── Document extraction loaders: Docling / OCR fallback, email, Yardi export ──────────
 
 def _pdf(path, pages):
     """A PDF with one page per entry; None = a page with no text layer (like a scan)."""

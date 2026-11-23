@@ -47,6 +47,8 @@ boto3>=1.26.0                  # S3 reader tool
 
 # ── Web search ────────────────────────────────────────────────────────────────
 cryptography>=42.0               # secrets vault encryption (Fernet)
+pyjwt[crypto]>=2.8              # SSO: OIDC ID token verification (services/sso_oidc.py)
+signxml>=4.0                   # SSO: SAML response signature verification (services/sso_saml.py)
 ddgs>=9.0                      # DuckDuckGo web search (no API key required)
 
 # ── Document ingestion ────────────────────────────────────────────────────────

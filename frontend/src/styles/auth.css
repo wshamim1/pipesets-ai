@@ -176,3 +176,32 @@
   color: #f8fafc;
   border-color: rgba(255, 255, 255, 0.35);
 }
+
+/* Single sign-on */
+.auth-link {
+  margin-top: -4px;
+  background: none;
+  border: none;
+  font: inherit;
+  color: #6366f1;
+  font-size: 13px;
+  cursor: pointer;
+  align-self: center;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+.auth-sso-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.auth-sso-choice em {
+  font-style: normal;
+  opacity: 0.75;
+}

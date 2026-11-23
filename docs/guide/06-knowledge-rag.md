@@ -23,7 +23,7 @@ Two ways to set it up:
 
 | Node | Choose | Advice |
 |---|---|---|
-| **Doc Loader** | Where documents come from: file upload, path, folder, S3, web page, sitemap, RSS, Wikipedia, arXiv, Postgres / MySQL / SQLite, email, Yardi export, images (OCR)… | Database loaders need a Connection node linked to them. Loaders shown as "Soon" can't run yet. Scanned PDFs: see [Document extraction](12-document-extraction.md#2-ocr-for-scanned-pages). |
+| **Doc Loader** | Where documents come from: file upload, path, folder, S3, web page, sitemap, RSS, Wikipedia, arXiv, Postgres / MySQL / SQLite, email, Yardi export, images (OCR), OKF bundles… | Database loaders need a Connection node linked to them. Loaders shown as "Soon" can't run yet. Scanned PDFs: see [Document extraction](12-document-extraction.md#2-ocr-for-scanned-pages). |
 | **Text Splitter** | Recursive, Token, Markdown, Semantic, Sentence, HTML; chunk size and overlap | Recursive with 500–1,000 characters and 10–20% overlap is a good default. Markdown for docs with headings. |
 | **Embedding** | OpenAI, Cohere, Google, Mistral, Voyage, Nomic, Ollama, llama.cpp, Bedrock, Azure OpenAI, or local sentence-transformers | Use the **same embedding model** for indexing and for the Retriever. Local runs offline. |
 | **Vector Store** | **Local** or **pgvector** | Local is in the app database: fine for a few thousand chunks. pgvector for production. Other store types in the list currently fall back to Local. |
@@ -41,6 +41,26 @@ changing the embedding model takes effect. The Retriever must use the same colle
 Connect the Retriever (or Knowledge Base) to the LLM node. Answers stream with **Retrieved
 Sources**: the chunks used and where they came from (file, page). In the system prompt, tell the
 model to answer only from the sources and to say when they don't cover the question.
+
+### OKF bundles
+
+The **OKF Bundle** loader reads an [Open Knowledge Format](https://github.com/open-knowledge-format/open-knowledge-format)
+bundle (v0.2 or v0.3): a folder, or a .zip of one, holding markdown concept files with YAML
+frontmatter. Each concept becomes one document. `index.md` and `log.md` are skipped, and so are
+files with no frontmatter or no `type`.
+
+Each chunk keeps the concept's `type`, `title`, `tags`, `sources`, outgoing links, `status`,
+staleness and trust tier in its metadata. The tier comes from `verified`: unverified,
+machine-verified, or human-reviewed when any `human:` verifier signed it after `generated.at`.
+The text starts with a short header, such as `[OKF policy · status: stable · trust: human]`, so the
+model can see how far to trust a passage. Stale concepts are marked `STALE` and deprecated ones
+name their `superseded_by`.
+
+In the node's **Knowledge trust (OKF)** card you can:
+
+- load only machine-verified or human-reviewed concepts;
+- leave out stale concepts (past `stale_after`);
+- include deprecated concepts, which are skipped by default.
 
 ## Getting good answers
 

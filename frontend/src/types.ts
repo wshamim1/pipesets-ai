@@ -116,7 +116,7 @@ export interface SkillRecord {
   tags: string[]
   category: string
   builtin?: boolean
-  // Agent skills (plan.md C10): description is the "when to use" text, tool_ids the tools it needs
+  // Agent skills: description is the "when to use" text, tool_ids the tools it needs
   when_to_use?: string
   required_tools?: string[]
   required_connections?: string[]
@@ -186,7 +186,7 @@ export interface TraceRecord {
 
 // ── Node data types ───────────────────────────────────────────────────────────
 
-/** Editor-only debugging on a node (plan.md F6): a breakpoint pauses Prompt Runner runs before the
+/** Editor-only debugging on a node: a breakpoint pauses Prompt Runner runs before the
  *  node's steps; a pin is used instead of running the node. Published runs never read either. */
 export type DebugPin = { output: string; pinned_at?: string }
 export type DebugNodeFields = {
@@ -280,6 +280,10 @@ export type DocLoaderNodeData = {
   ocr_language?: string
   ocr_provider?: string
   ocr_model?: string
+  /** OKF bundle loader only: backend loaders/files/okf.py */
+  okf_include_deprecated?: boolean
+  okf_include_stale?: boolean
+  okf_min_trust?: 'any' | 'machine' | 'human'
   chunk_strategy: 'fixed' | 'paragraph' | 'sentence'
   isSelected?: boolean
   onDelete?: () => void

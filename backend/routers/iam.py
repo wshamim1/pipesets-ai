@@ -170,6 +170,12 @@ def _purge_scope(conn, tenant_id: str, project_id: Optional[str] = None) -> Dict
     """Delete a workspace's (or one project's) rows from the tables no foreign key covers; the
     database cascades the rest (memberships, groups, projects, ACLs) when the parent goes."""
     removed = {}
+    if not project_id:   # SSO links and pending sign-ins hang off the workspace's identity providers
+        for table in ("sso_identities", "sso_states"):
+            n = conn.execute(f"DELETE FROM {table} WHERE provider_id IN "
+                             "(SELECT id FROM sso_providers WHERE tenant_id = ?)", (tenant_id,)).rowcount
+            if n:
+                removed[table] = n
     for table in _scoped_tables("project_id" if project_id else "tenant_id"):
         where, args = ("tenant_id = ? AND project_id = ?", (tenant_id, project_id)) if project_id \
             else ("tenant_id = ?", (tenant_id,))
@@ -177,6 +183,13 @@ def _purge_scope(conn, tenant_id: str, project_id: Optional[str] = None) -> Dict
         if n:
             removed[table] = n
     return removed
+
+
+def _require_session_scope(request: Request, tenant_id: str) -> None:
+    """A session made by single sign-on reaches only its own tenant (services/sso.py)."""
+    sso_tenant = getattr(request.state, "sso_tenant", None)
+    if sso_tenant and tenant_id != sso_tenant:
+        raise HTTPException(status_code=403, detail="This single sign-on session can't manage other workspaces.")
 
 
 def _require_tenant_owner(conn, tenant_id: str, user_id: str) -> None:
@@ -193,14 +206,16 @@ def get_context(request: Request):
         "project_id": ctx.project_id,
         "user_id": ctx.user_id,
         "can_admin": has_access(ctx, "iam", "admin"),
-        "server_admin": auth.is_server_admin(ctx.user_id),
+        "server_admin": not ctx.sso_tenant and auth.is_server_admin(ctx.user_id),
+        "sso_session": bool(ctx.sso_tenant),
     }
 
 
 @router.get("/tenants")
 def list_tenants(request: Request):
-    """Tenants the caller belongs to."""
+    """Tenants the caller belongs to (and the session may open)."""
     user_id = get_current_user(request)
+    sso_tenant = getattr(request.state, "sso_tenant", None)
     conn = get_db_connection()
     rows = conn.execute(
         """
@@ -211,6 +226,7 @@ def list_tenants(request: Request):
         """,
         (user_id,),
     ).fetchall()
+    rows = [r for r in rows if auth.tenant_allowed(conn, r["id"], r["role"], sso_tenant)]
     conn.close()
     return {"tenants": [_row_to_dict(r) for r in rows]}
 
@@ -218,6 +234,8 @@ def list_tenants(request: Request):
 @router.post("/tenants")
 def create_tenant(req: TenantCreateRequest, request: Request):
     user_id = get_current_user(request)
+    if getattr(request.state, "sso_tenant", None):
+        raise HTTPException(status_code=403, detail="Sign in with your password to create another workspace.")
     name = req.name.strip()
     if not name:
         raise HTTPException(status_code=400, detail="Tenant name is required")
@@ -248,6 +266,7 @@ def create_tenant(req: TenantCreateRequest, request: Request):
 @router.put("/tenants/{tenant_id}")
 def update_tenant(tenant_id: str, req: TenantUpdateRequest, request: Request):
     user_id = get_current_user(request)
+    _require_session_scope(request, tenant_id)
     conn = get_db_connection()
     row = conn.execute("SELECT * FROM tenants WHERE id = ?", (tenant_id,)).fetchone()
     if not row:
@@ -283,6 +302,7 @@ def update_tenant(tenant_id: str, req: TenantUpdateRequest, request: Request):
 @router.delete("/tenants/{tenant_id}")
 def delete_tenant(tenant_id: str, request: Request):
     ctx = get_request_context(request)
+    _require_session_scope(request, tenant_id)
     conn = get_db_connection()
     tenant = conn.execute("SELECT 1 FROM tenants WHERE id = ?", (tenant_id,)).fetchone()
     if not tenant:

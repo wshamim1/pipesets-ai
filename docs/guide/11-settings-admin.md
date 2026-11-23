@@ -6,6 +6,7 @@ Open **Settings** with the ⚙ gear in the top bar.
 |---|---|
 | **Members & access** | Invite users, set roles, manage groups and access rules |
 | **Workspaces & projects** | Create workspaces (tenants) and projects; switch between them in the top bar |
+| **Single sign-on** | Sign in with Okta, Entra ID, Google, Keycloak… (OIDC or SAML); map IdP groups to roles (owners only) |
 | **API keys** | Keys for `/v1`, MCP and the SDK ([Share](10-share-integrate.md#rest-api-v1)) |
 | **Audit log** | Who changed what: keys, secrets, members, publishing, chat links, review decisions; export it |
 | **Tools & MCP packages** | Install the built-in tools and MCP servers the builder's sidebar offers |
@@ -36,6 +37,57 @@ Open **Settings** with the ⚙ gear in the top bar.
   beats any allow.
 - New users: self sign-up is on by default (`AUTH_ALLOW_SIGNUP=0` turns it off so only admins add
   users). Changing a password ends that user's sessions.
+
+## Single sign-on (SSO)
+
+Workspace owners can let people sign in with their work account. Go to **Settings → Single sign-on**
+and add an **OIDC** provider (Okta, Microsoft Entra ID, Google Workspace, Keycloak, Auth0…) or a
+**SAML 2.0** provider (ADFS, Entra ID, Okta, OneLogin, PingFederate…). On the sign-in screen, people
+choose **Sign in with SSO** and enter their work email. The provider is picked by **Email domains**.
+
+**OIDC.** Create a web application ("confidential client") at the IdP and register the **Redirect
+URI** that Pipesets shows. Then enter the **Issuer URL**, **Client ID** and **Client secret**. The
+secret is stored encrypted and never shown again; leave it empty when editing to keep it. Pipesets
+uses the authorization code flow with PKCE. It checks the ID token's signature, issuer, audience,
+expiry and nonce, and refuses emails the IdP marks unverified.
+
+**SAML.** Give the IdP the **SP entity ID / metadata** URL (it serves Pipesets' metadata) and the
+**ACS URL**. Then use **Upload IdP metadata (.xml)** to fill in the IdP's entity ID, single
+sign-on URL and signing certificate in one step, or enter them by hand. **Upload certificate**
+takes a `.pem`, `.cer` or `.crt` file, which is handy when the IdP rotates its key.
+Responses must be signed with SHA-256 or stronger. Encrypted assertions and IdP-initiated sign-in
+aren't supported yet: start the sign-in from Pipesets. **Test** checks the configuration: OIDC
+discovery, or the certificate and its expiry date.
+
+**Role mapping.** Name the claim or attribute that lists the person's groups or roles. Examples are
+`groups`, Keycloak's `realm_access.roles`, or Entra ID's groups claim. Then map values to a
+workspace role, a Pipesets group, or both:
+
+- The highest mapped role wins.
+- When nothing matches, the person signs in as a viewer, as an editor, or is refused, as you choose.
+- With **Re-apply roles at every sign-in**, a change at the IdP takes effect at the next sign-in,
+  including removal from mapped groups. The workspace's last owner is never demoted.
+- Owner can't be the default role. Map an IdP group to it instead.
+
+**Accounts.** With **Create accounts on first sign-in**, new people get an account with no
+password. Without it, an owner must add them under Members & access first. An existing account
+with the same email is linked once. After that, the IdP's user ID is what matches, not the email.
+
+**Security.** A session opened with SSO only reaches the workspace whose identity provider signed
+the person in. It never has server-admin rights, even for someone who is also a server admin.
+Every SSO sign-in, successful or refused, is recorded in the audit log as `sso.login`, and so are
+changes to providers. Removing a provider signs out everyone who signed in with it.
+
+**Require SSO.** With this on, members can't open the workspace with a password session. Owners
+still can, so a broken IdP can't lock everyone out.
+
+**Behind a proxy:**
+
+- Set `PIPESETS_PUBLIC_URL` to the backend's public address. The redirect URI, ACS URL and SP
+  entity ID are built from it.
+- Set `PIPESETS_APP_URL` when the UI is on a different address.
+- An IdP on a private network must be listed in `EXTERNAL_AGENT_ALLOWED_HOSTS`, because Pipesets
+  only fetches discovery and keys from public addresses unless told otherwise.
 
 ## Tools & MCP packages
 
