@@ -8,6 +8,12 @@ switch projects. Each `/api` request carries `x-tenant-id` and `x-project-id`, a
 `RequestContext`. Handlers filter every query by the context's tenant and project. A resource in
 another tenant returns 404, not 403, so its existence isn't revealed.
 
+Saved connections (database and API credentials) follow the same rule: they belong to one
+project (migration `0038`). Because they hold credentials, they need the `secrets` permission:
+`read` to list them, `write` to change, test or delete them. A connection test that reuses a saved
+password only accepts a connection from the caller's own project, so a password can't be sent to
+a host someone else chooses.
+
 ## Who the caller is
 
 | Caller | Credential | Where checked |

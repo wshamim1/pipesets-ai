@@ -35,6 +35,8 @@ Open **Settings** with the ⚙ gear in the top bar.
 - **Groups and access rules** narrow access further: allow or deny a user or group a resource
   (apps, tools, secrets…) and action (read, write…), in one project or the whole workspace. A deny
   beats any allow.
+- **Saved connections** (database and API credentials) belong to the current project. Members
+  need the **secrets** permission to see them (`read`) or change them (`write`). Owners have both.
 - New users: self sign-up is on by default (`AUTH_ALLOW_SIGNUP=0` turns it off so only admins add
   users). Changing a password ends that user's sessions.
 

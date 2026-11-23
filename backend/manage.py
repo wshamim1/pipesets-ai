@@ -14,6 +14,9 @@ manage.py — operator CLI for the backend (run from the backend directory).
                                              copy every row from DATABASE_URL's database into URL's
                                              (e.g. SQLite → Postgres); then point DATABASE_URL at it
   python manage.py rotate-secrets            re-encrypt every secret under the primary master key
+  python manage.py connections [--assign CONN_ID|--all-unscoped --project P]
+                                             list saved connections no workspace can see (left unscoped by
+                                             migration 0038), or give them to a project
   python manage.py kms-wrap-key --key-id K [--wrap-current]
                                              print a KMS-encrypted master key for PIPESETS_MASTER_KEY_KMS
   python manage.py worker [--concurrency N] [--once]
@@ -37,6 +40,38 @@ load_dotenv()  # DATABASE_URL etc. from backend/.env, before db reads them
 from db import BACKEND_DIR, get_db_connection, init_db, safe_database_url  # noqa: E402
 from services import api_keys, auth, secret_store
 from services.request_context import RequestContext
+
+
+def connections_command(assign, all_unscoped, project_id) -> int:
+    conn = get_db_connection()
+    try:
+        rows = conn.execute("SELECT id, name, type FROM connections WHERE tenant_id IS NULL OR project_id IS NULL "
+                            "ORDER BY created_at").fetchall()
+        if not assign and not all_unscoped:
+            for r in rows:
+                print(f"{r['id']:16} {r['type']:12} {r['name']}")
+            print(f"{len(rows)} unscoped connection(s)." + (
+                " Assign with: python manage.py connections --assign CONN_ID --project PROJECT_ID" if rows else ""))
+            return 0
+        if not project_id:
+            print("--project is required to assign", file=sys.stderr)
+            return 1
+        proj = conn.execute("SELECT tenant_id FROM projects WHERE id = ?", (project_id,)).fetchone()
+        if not proj:
+            print(f"No project {project_id}", file=sys.stderr)
+            return 1
+        ids = [r["id"] for r in rows] if all_unscoped else [assign]
+        if assign and assign not in {r["id"] for r in rows}:
+            print(f"{assign} is not an unscoped connection (scoped ones are moved by their workspace)", file=sys.stderr)
+            return 1
+        for cid in ids:
+            conn.execute("UPDATE connections SET tenant_id = ?, project_id = ? WHERE id = ?",
+                         (proj["tenant_id"], project_id, cid))
+        conn.commit()
+        print(f"Assigned {len(ids)} connection(s) to {proj['tenant_id']}/{project_id}.")
+        return 0
+    finally:
+        conn.close()
 
 
 def main(argv=None) -> int:
@@ -69,6 +104,11 @@ def main(argv=None) -> int:
     sadmin.add_argument("--revoke", action="store_true")
     sadmin.add_argument("--list", action="store_true")
     sub.add_parser("rotate-secrets", help="Re-encrypt all secrets with the primary master key")
+
+    conns = sub.add_parser("connections", help="List or assign saved connections that belong to no workspace")
+    conns.add_argument("--assign", metavar="CONN_ID", help="the unscoped connection to assign")
+    conns.add_argument("--all-unscoped", action="store_true", help="assign every unscoped connection")
+    conns.add_argument("--project", help="the project to give them to (its workspace is implied)")
 
     kms = sub.add_parser("kms-wrap-key", help="Print a KMS-encrypted master key for PIPESETS_MASTER_KEY_KMS")
     kms.add_argument("--key-id", required=True, help="KMS key ARN, id or alias (e.g. alias/pipesets)")
@@ -139,6 +179,8 @@ def main(argv=None) -> int:
             return 1
         print(f"{'Revoked' if args.revoke else 'Granted'} server admin: {args.email} ({user_id})")
         return 0
+    if args.command == "connections":
+        return connections_command(args.assign, args.all_unscoped, args.project)
     if args.command == "rotate-secrets":
         print(f"Re-encrypted {secret_store.rotate_all()} secret(s) with the primary master key.")
         return 0

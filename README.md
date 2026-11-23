@@ -696,6 +696,11 @@ docker compose up -d --build     # or: podman compose up -d --build
   ("Update successful") reward a model that only claims it. Each option runs once, so on a small
   dataset one unlucky answer can reject a good model; set a tolerance. Nodes inside called pipelines
   are tried but not changed by **Apply to draft**: edit and re-publish those pipelines.
+- **Upgrading to saved connections per project (migration 0038):** each existing connection
+  moves to the project of the pipelines that use it. On a server with several workspaces, a
+  connection no pipeline uses, or one used by several workspaces, is hidden until a server admin
+  assigns it with `python manage.py connections --assign CONN_ID --project PROJECT_ID`. The
+  migration logs how many were left hidden.
 - **Single sign-on:** SAML responses must be signed, with SHA-256 or stronger. Encrypted
   assertions, IdP-initiated sign-in, single logout and SCIM provisioning aren't supported yet.
   Removing someone at the IdP takes effect at their next sign-in. Existing sessions run until they

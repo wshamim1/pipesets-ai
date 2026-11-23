@@ -20,6 +20,10 @@ Endpoints:
 - POST   /api/connections/test        — Test ad-hoc connection config
 - POST   /api/connections/{id}/test   — Test saved connection
 
+Connections belong to a tenant and project (migration 0038): every route sees only the caller's
+project. They hold credentials, so they use the ``secrets`` permission — ``read`` to list and
+view, ``write`` to create, change, test and delete (tenant owners have both).
+
 Credentials (password, secret_access_key, auth headers, …) are stored and returned
 sealed — "enc://<ciphertext>" under PIPESETS_MASTER_KEY (services/secret_store.py). The
 browser and canvas only ever hold the sealed form; it is decrypted server-side for a
@@ -36,11 +40,13 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from db import get_db_connection
 from services import secret_store
+from services.acl import require_access
+from services.request_context import RequestContext, get_request_context
 
 logger = logging.getLogger("pipesets-ai-backend")
 
@@ -153,11 +159,19 @@ def _row_to_dict(row) -> Dict[str, Any]:
     return d
 
 
-def _get_connection_by_id(conn_id: str) -> Optional[Dict[str, Any]]:
+def _get_connection_by_id(conn_id: str, ctx: RequestContext) -> Optional[Dict[str, Any]]:
+    """A connection in the caller's project, or None (also for another workspace's: no existence leak)."""
     db = get_db_connection()
-    row = db.execute("SELECT * FROM connections WHERE id = ?", (conn_id,)).fetchone()
+    row = db.execute("SELECT * FROM connections WHERE id = ? AND tenant_id = ? AND project_id = ?",
+                     (conn_id, ctx.tenant_id, ctx.project_id)).fetchone()
     db.close()
     return _row_to_dict(row) if row else None
+
+
+def _ctx(request: Request, action: str) -> RequestContext:
+    ctx = get_request_context(request)
+    require_access(ctx, "secrets", action)
+    return ctx
 
 
 # ── Live Test Handler ─────────────────────────────────────────────────────────
@@ -376,17 +390,20 @@ async def test_connection_logic(conn_type: str, config: Dict[str, Any]) -> Dict[
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
 @router.get("")
-def list_connections():
-    """List all saved connections."""
+def list_connections(request: Request):
+    """Saved connections of the caller's project."""
+    ctx = _ctx(request, "read")
     db = get_db_connection()
-    rows = db.execute("SELECT * FROM connections ORDER BY created_at ASC").fetchall()
+    rows = db.execute("SELECT * FROM connections WHERE tenant_id = ? AND project_id = ? ORDER BY created_at ASC",
+                      (ctx.tenant_id, ctx.project_id)).fetchall()
     db.close()
     return [_row_to_dict(r) for r in rows]
 
 
 @router.post("")
-async def create_connection(req: ConnectionCreate):
+async def create_connection(req: ConnectionCreate, request: Request):
     """Create a new connection with initial verification."""
+    ctx = _ctx(request, "write")
     conn_id = f"conn_{uuid.uuid4().hex[:8]}"
     now = datetime.utcnow().isoformat()
 
@@ -399,8 +416,9 @@ async def create_connection(req: ConnectionCreate):
     db = get_db_connection()
     db.execute(
         """
-        INSERT INTO connections (id, name, type, icon, description, config, status, status_msg, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO connections (id, name, type, icon, description, config, status, status_msg, created_at, updated_at,
+                                 tenant_id, project_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             conn_id,
@@ -413,27 +431,30 @@ async def create_connection(req: ConnectionCreate):
             status_msg,
             now,
             now,
+            ctx.tenant_id,
+            ctx.project_id,
         ),
     )
     db.commit()
     db.close()
 
-    return _get_connection_by_id(conn_id)
+    return _get_connection_by_id(conn_id, ctx)
 
 
 @router.get("/{conn_id}")
-def get_connection(conn_id: str):
+def get_connection(conn_id: str, request: Request):
     """Get single connection by ID."""
-    conn = _get_connection_by_id(conn_id)
+    conn = _get_connection_by_id(conn_id, _ctx(request, "read"))
     if not conn:
         raise HTTPException(status_code=404, detail="Connection not found")
     return conn
 
 
 @router.put("/{conn_id}")
-async def update_connection(conn_id: str, req: ConnectionUpdate):
+async def update_connection(conn_id: str, req: ConnectionUpdate, request: Request):
     """Update connection details and re-verify."""
-    existing = _get_connection_by_id(conn_id)
+    ctx = _ctx(request, "write")
+    existing = _get_connection_by_id(conn_id, ctx)
     if not existing:
         raise HTTPException(status_code=404, detail="Connection not found")
 
@@ -453,21 +474,24 @@ async def update_connection(conn_id: str, req: ConnectionUpdate):
         """
         UPDATE connections
         SET name = ?, type = ?, icon = ?, description = ?, config = ?, status = ?, status_msg = ?, updated_at = ?
-        WHERE id = ?
+        WHERE id = ? AND tenant_id = ? AND project_id = ?
         """,
-        (name, conn_type, icon, description, json.dumps(config), status, status_msg, now, conn_id),
+        (name, conn_type, icon, description, json.dumps(config), status, status_msg, now, conn_id,
+         ctx.tenant_id, ctx.project_id),
     )
     db.commit()
     db.close()
 
-    return _get_connection_by_id(conn_id)
+    return _get_connection_by_id(conn_id, ctx)
 
 
 @router.delete("/{conn_id}")
-def delete_connection(conn_id: str):
+def delete_connection(conn_id: str, request: Request):
     """Delete a connection."""
+    ctx = _ctx(request, "write")
     db = get_db_connection()
-    cur = db.execute("DELETE FROM connections WHERE id = ?", (conn_id,))
+    cur = db.execute("DELETE FROM connections WHERE id = ? AND tenant_id = ? AND project_id = ?",
+                     (conn_id, ctx.tenant_id, ctx.project_id))
     db.commit()
     deleted = cur.rowcount > 0
     db.close()
@@ -477,18 +501,24 @@ def delete_connection(conn_id: str):
 
 
 @router.post("/test")
-async def test_adhoc_connection(req: ConnectionTestRequest):
-    """Test connection credentials without saving."""
-    existing = _get_connection_by_id(req.connection_id) if req.connection_id else None
+async def test_adhoc_connection(req: ConnectionTestRequest, request: Request):
+    """Test connection credentials without saving. With ``connection_id``, empty secret fields reuse
+    that saved connection's — only one in the caller's project, or its password could be sent to a
+    host of the caller's choosing."""
+    ctx = _ctx(request, "write")
+    existing = _get_connection_by_id(req.connection_id, ctx) if req.connection_id else None
+    if req.connection_id and not existing:
+        raise HTTPException(status_code=404, detail="Connection not found")
     config = _seal_config(req.config, existing["config"] if existing else None)
     result = await test_connection_logic(req.type, _plain_config(config))
     return result
 
 
 @router.post("/{conn_id}/test")
-async def test_saved_connection(conn_id: str):
+async def test_saved_connection(conn_id: str, request: Request):
     """Test and update status for a saved connection."""
-    conn = _get_connection_by_id(conn_id)
+    ctx = _ctx(request, "write")
+    conn = _get_connection_by_id(conn_id, ctx)
     if not conn:
         raise HTTPException(status_code=404, detail="Connection not found")
 
@@ -499,8 +529,8 @@ async def test_saved_connection(conn_id: str):
 
     db = get_db_connection()
     db.execute(
-        "UPDATE connections SET status = ?, status_msg = ?, updated_at = ? WHERE id = ?",
-        (status, status_msg, now, conn_id),
+        "UPDATE connections SET status = ?, status_msg = ?, updated_at = ? WHERE id = ? AND tenant_id = ? AND project_id = ?",
+        (status, status_msg, now, conn_id, ctx.tenant_id, ctx.project_id),
     )
     db.commit()
     db.close()
