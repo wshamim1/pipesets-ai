@@ -1,5 +1,5 @@
 """
-child_tool_loop.py — the tool loop a Master Agent's child agents run (plan.md C11, step 1).
+child_tool_loop.py — the tool loop a Master Agent's child agents run.
 
 A child agent with Tool / Toolkit / MCP server nodes or Skill nodes wired to it gets the same loop
 an LLM node runs, minus streaming: the model sees the attached tools (and ``use_skill`` when skills

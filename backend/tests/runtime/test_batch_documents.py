@@ -1,4 +1,4 @@
-"""Batch runs over documents (plan.md F5 → P1): uploaded files become one row each, ``{document}`` is the
+"""Batch runs over documents: uploaded files become one row each, ``{document}`` is the
 file's text read when its row runs, unreadable files fail without a run, a Structured Extract pipeline
 files its fields in the review queue under the batch's name, and deleting the batch removes the files.
 The tests are steps of one scenario, in order."""

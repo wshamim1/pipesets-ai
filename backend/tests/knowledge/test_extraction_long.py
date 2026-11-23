@@ -1,4 +1,4 @@
-"""Long documents and the faster review queue (plan.md P1): splitting a document into parts at section
+"""Long documents and the faster review queue: splitting a document into parts at section
 headings, merging the parts' answers (verified quote wins, disagreements kept as alternatives and
 flagged), the cited page shown with each review, bulk approval and the per-field accuracy report.
 Steps of one scenario, in order; the model is stubbed."""

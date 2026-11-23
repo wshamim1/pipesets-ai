@@ -1,5 +1,5 @@
 """
-Child agents run the tool loop (plan.md C11 step 1, services/child_tool_loop.py). A child with tool
+Child agents run the tool loop (services/child_tool_loop.py). A child with tool
 nodes wired to it is offered those tools, its calls run and the results go back to the model; with
 Skill nodes it loads skills on demand like an LLM node. Mock / keyless children keep the single
 call with skills in the prompt. Published flows pass the wired tools and skills to their children.

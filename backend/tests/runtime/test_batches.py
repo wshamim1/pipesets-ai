@@ -1,4 +1,4 @@
-"""Batch runs (plan.md F5): reading input files, one prompt per row from a template, at most
+"""Batch runs: reading input files, one prompt per row from a template, at most
 ``concurrency`` rows of a batch queued at once, every row accounted for, cancel, retry, a lost
 queue chain picked up by the sweep, CSV export and tenant scoping. The tests are steps of one
 scenario, in order."""

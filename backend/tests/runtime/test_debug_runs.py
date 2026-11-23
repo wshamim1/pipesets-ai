@@ -1,5 +1,5 @@
 """
-Step-through debugging (plan.md F6, services/debug_run.py): breakpoints pause a checkpointed run
+Step-through debugging (services/debug_run.py): breakpoints pause a checkpointed run
 before a node's step, Continue resumes it without repeating finished model calls, an edited input
 reaches the step, Step pauses at every step, pinned outputs replace a tool / retriever / LLM / Child
 agent at no cost, and published runs never read pins.

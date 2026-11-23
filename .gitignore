@@ -54,3 +54,5 @@ node_modules/
 
 # --- Local / private notes (not for the repo) ---
 to_be_deleted/
+/plan.md
+/done.md

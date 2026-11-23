@@ -2,7 +2,7 @@
 
 Run from the backend directory:   python scripts/seed_prices.py
 
-One-off tool for while LiteLLM is still installed (plan.md A5 step 2). Once it is removed,
+One-off tool for while LiteLLM is still installed. Once it is removed,
 the files are maintained by hand: add or fix a model in a reviewed PR, or override locally in
 <data dir>/prices/<provider>.json. Re-running this replaces every entry with LiteLLM's.
 """

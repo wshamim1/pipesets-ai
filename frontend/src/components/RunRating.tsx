@@ -1,5 +1,5 @@
 /**
- * 👍 / 👎 on a finished run in the Prompt Runner (backend routers/feedback.py, plan.md F2). The
+ * 👍 / 👎 on a finished run in the Prompt Runner (backend routers/feedback.py). The
  * rating is the builder's own; it shows up next to chat-link and API ratings under Evaluate →
  * Feedback, where 👎 ones can be turned into eval cases. After a 👎, an optional note says what was
  * wrong and what the answer should have been.

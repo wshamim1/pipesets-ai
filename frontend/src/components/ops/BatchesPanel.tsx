@@ -1,6 +1,6 @@
 /**
  * Automation → Batches: run a published pipeline once per row of a file (backend
- * routers/batches.py, plan.md F5). Upload a CSV / TSV / JSONL / JSON / Excel file (or one prompt per
+ * routers/batches.py). Upload a CSV / TSV / JSONL / JSON / Excel file (or one prompt per
  * line in a .txt), write a prompt template with {column} placeholders, and every row becomes one
  * background run — retried with backoff, resumable from its checkpoint, at most "rows at once" of
  * one batch running so schedules and webhooks keep their turn. Progress refreshes while a batch

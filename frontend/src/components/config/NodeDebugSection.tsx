@@ -1,5 +1,5 @@
 /**
- * 🐞 Debug strip at the top of a node's config (plan.md F6): a breakpoint pauses Prompt Runner runs
+ * 🐞 Debug strip at the top of a node's config: a breakpoint pauses Prompt Runner runs
  * before this node's steps, and a pinned output is used instead of running the node — no model
  * call, no tool run — so the nodes after it can be tested for free. Both are editor-only:
  * published, API, scheduled and batch runs ignore them. The node's header has the same two

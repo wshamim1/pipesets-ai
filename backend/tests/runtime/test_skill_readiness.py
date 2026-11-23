@@ -1,4 +1,4 @@
-"""Skill readiness (plan.md C10 step 3, reframed): a flow can't be published while a Skill node's
+"""Skill readiness: a flow can't be published while a Skill node's
 required tools aren't attached to its LLM node, or are attached without a setting they can't run
 without. The tests are steps of one scenario, in order."""
 import pytest

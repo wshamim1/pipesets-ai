@@ -1,6 +1,6 @@
 /**
- * Evaluate → Feedback: 👍 / 👎 from the people who read the answers (backend routers/feedback.py,
- * plan.md F2) — builders in the Prompt Runner, chat-link visitors, and API callers' end users.
+ * Evaluate → Feedback: 👍 / 👎 from the people who read the answers (backend routers/feedback.py)
+ * — builders in the Prompt Runner, chat-link visitors, and API callers' end users.
  * The summary shows satisfaction per pipeline and version, so a new version that answers worse
  * shows up; the list shows each rated run's prompt, answer and note. Selected ratings become eval
  * cases: expected = the rater's correction, or the answer itself for a 👍.

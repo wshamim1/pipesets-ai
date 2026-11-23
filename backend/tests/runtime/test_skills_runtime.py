@@ -1,5 +1,5 @@
 """
-Skills on demand (plan.md C10 step 1, services/skills_runtime.py). An LLM node with the four starter
+Skills on demand (services/skills_runtime.py). An LLM node with the four starter
 skills and all their tools attached first sees only use_skill and its directly attached tool; it
 loads the Airflow skill, gets the Airflow tools, uses them and answers (the exit criterion, with a
 scripted model). Also: "always" mode, unknown / repeated / over-the-cap loads, a hidden tool called

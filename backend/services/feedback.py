@@ -1,5 +1,5 @@
 """
-feedback.py — 👍 / 👎 on runs, from the people who read the answers (plan.md F2).
+feedback.py — 👍 / 👎 on runs, from the people who read the answers.
 
 Who can rate
 ------------

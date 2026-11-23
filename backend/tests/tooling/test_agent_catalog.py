@@ -1,4 +1,4 @@
-"""Built-in agents and Settings → Agents (plan.md C11 step 3): the registry's specs point at real tools
+"""Built-in agents and Settings → Agents: the registry's specs point at real tools
 and skills, starters are installed by default, install / uninstall / reset, installing with the tools
 an agent still needs, readiness, "used in a pipeline", access rules and the audit log."""
 

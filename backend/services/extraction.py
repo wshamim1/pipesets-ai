@@ -1,5 +1,5 @@
 """
-extraction.py — structured extraction with field-level citations (plan.md P1).
+extraction.py — structured extraction with field-level citations.
 
 Given a document's pages (from any loader: ``{"text", "metadata": {"page", ...}}``) and a list of
 fields, a model returns each field's value, the page it found it on and the exact text it read it

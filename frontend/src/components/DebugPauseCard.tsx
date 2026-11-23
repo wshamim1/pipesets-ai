@@ -1,5 +1,5 @@
 /**
- * A Prompt Runner run paused at a breakpoint (plan.md F6, backend services/debug_run.py): shows the
+ * A Prompt Runner run paused at a breakpoint (backend services/debug_run.py): shows the
  * input the paused step is about to use — a tool's input, a model call's messages, the retrieval
  * query — lets the builder edit it, then Continue (to the next breakpoint), Step (pause before the
  * next step, whatever node it is) or Stop. Steps before the pause are replayed from the checkpoint,

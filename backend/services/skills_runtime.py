@@ -1,5 +1,5 @@
 """
-skills_runtime.py — skills an LLM node loads when a request needs them (plan.md C10, step 1).
+skills_runtime.py — skills an LLM node loads when a request needs them.
 
 Two modes, set on the LLM node (``PromptRunRequest.skill_mode``):
 

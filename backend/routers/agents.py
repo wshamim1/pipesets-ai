@@ -97,7 +97,7 @@ class ChildAgentConfig(BaseModel):
     middleware_configs: Optional[List[Dict[str, Any]]] = None
     # human_gate node wired to this child: pauses the run for review of its output
     human_gate: Optional[Dict[str, Any]] = None
-    # Editor debugging (plan.md F6): answer with this instead of running the child. Only the Prompt
+    # Editor debugging: answer with this instead of running the child. Only the Prompt
     # Runner sends it; the server's request builder never copies it from a node (the node keeps its
     # pin as ``debug_pin``), so published runs can't use a pin.
     pinned_output: Optional[str] = None
@@ -1027,7 +1027,7 @@ def list_runs(request: Request, limit: int = 20, status: Optional[str] = None, k
 @router.get("/runs/{run_id}/steps/{step_key}")
 def get_step_output(run_id: str, step_key: str, request: Request):
     """The full output a single-LLM run saved for one step (``tool:…``, ``llm:N``, ``rag``): what the
-    editor pins to a node (plan.md F6). Streamed tool events and trace spans carry only a preview."""
+    editor pins to a node. Streamed tool events and trace spans carry only a preview."""
     ctx = get_request_context(request)
     conn = get_db_connection()
     try:

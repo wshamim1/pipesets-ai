@@ -1,4 +1,4 @@
-"""Feedback on runs (plan.md F2, services/feedback.py): a 👍 / 👎 and an optional comment per run.
+"""Feedback on runs (services/feedback.py): a 👍 / 👎 and an optional comment per run.
 
 * ``run_feedback``: one row per (run, rater). ``rater`` is who gave it — a builder's user id, a
   chat-link visitor (``link:<link id>:<session>``) or an API caller's end user (``key:<key id>:<user>``);

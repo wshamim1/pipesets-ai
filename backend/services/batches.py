@@ -1,5 +1,5 @@
 """
-batches.py — run a published pipeline once per input row (plan.md F5).
+batches.py — run a published pipeline once per input row.
 
 A batch is a pipeline, a prompt template and a list of rows (CSV, JSONL, Excel or one prompt per
 line, ``parse_file``). ``{column}`` placeholders in the template make one prompt per row; each row is

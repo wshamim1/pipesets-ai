@@ -1,5 +1,5 @@
 """
-agent_catalog.py — built-in agents (backend/agents/) and Settings → Agents (plan.md C11 step 3).
+agent_catalog.py — built-in agents (backend/agents/) and Settings → Agents.
 
 Endpoints
 ---------

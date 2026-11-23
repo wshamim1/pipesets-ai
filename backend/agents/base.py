@@ -1,5 +1,5 @@
 """
-Built-in agent specs (plan.md C11 step 3). A module in ``backend/agents/`` defines ``AGENT`` or
+Built-in agent specs. A module in ``backend/agents/`` defines ``AGENT`` or
 ``AGENTS`` and the registry (agents/__init__.py) picks it up.
 
 Two kinds of built-in:

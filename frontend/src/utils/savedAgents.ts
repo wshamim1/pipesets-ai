@@ -3,7 +3,7 @@ import { API_BASE } from '../types'
 import type { ChildAgentNodeData, FlowEdge, FlowNode } from '../types'
 
 /**
- * Saved agents (plan.md C11 step 2): a child agent saved with the tool, toolkit and skill nodes wired
+ * Saved agents: a child agent saved with the tool, toolkit and skill nodes wired
  * to it. "Save as agent" builds the spec from the canvas; dropping a saved agent recreates those nodes
  * and edges. The server blanks credentials on save, so a dropped agent asks for its keys again.
  */

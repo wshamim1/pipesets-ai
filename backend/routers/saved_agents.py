@@ -1,5 +1,5 @@
 """
-saved_agents.py — agents saved from the canvas (plan.md C11 step 2).
+saved_agents.py — agents saved from the canvas.
 
 "Save as agent" on a child agent stores its settings plus the tool, toolkit and skill nodes wired to
 it as one ``spec``; dropping the saved agent onto another canvas recreates the child and those nodes,

@@ -15,8 +15,7 @@ It covers:
 7. [Troubleshooting](#7-troubleshooting)
 
 Status: first version, 2026-11-02. Tesseract OCR is checked on real scans. Vision OCR and
-Structured Extract are only tested with stubbed models so far. OCRmyPDF hasn't run yet. See
-[plan.md](../../plan.md) (P1) for what's open.
+Structured Extract are only tested with stubbed models so far. OCRmyPDF hasn't run yet.
 
 ---
 

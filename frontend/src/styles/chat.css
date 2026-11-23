@@ -452,7 +452,7 @@
 }
 
 
-/* Paused at a breakpoint (DebugPauseCard, plan.md F6) */
+/* Paused at a breakpoint (DebugPauseCard) */
 .debug-pause {
   display: flex;
   flex-direction: column;

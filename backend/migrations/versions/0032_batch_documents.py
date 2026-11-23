@@ -1,4 +1,4 @@
-"""Batch runs over documents (plan.md F5, services/batches.py).
+"""Batch runs over documents (services/batches.py).
 
 batch_runs.source: what the rows came from, as JSON — ``{"kind": "rows"}`` for a table (CSV, JSONL,
 Excel, …) or ``{"kind": "documents", "loader": ..., "ocr_engine": ..., "max_chars": ...}`` for

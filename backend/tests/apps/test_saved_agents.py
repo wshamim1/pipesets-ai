@@ -1,5 +1,5 @@
 """
-Saved agents (plan.md C11 step 2, routers/saved_agents.py): a child agent saved with its tool and skill
+Saved agents (routers/saved_agents.py): a child agent saved with its tool and skill
 nodes, versioned on every save, credentials blanked (secret:// refs kept), scoped to its project.
 """
 

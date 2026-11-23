@@ -1,4 +1,4 @@
-"""Agent skills, step 1 (plan.md C10): versions and what a skill needs.
+"""Agent skills, step 1: versions and what a skill needs.
 
 * ``skills.version``: bumped on every save; ``skills.required_connections``: connection types the
   skill's tools need (e.g. ``airflow``), JSON. The skill's "when to use" text stays in

@@ -1,5 +1,5 @@
 """
-Tool-backed built-in agents (plan.md C11 step 4, backend/agents/) run as dropped: a child with the
+Tool-backed built-in agents (backend/agents/) run as dropped: a child with the
 agent's prompt and a tool node per need (labelled with the tool's catalog name, as the canvas does) is
 offered those tools, calls one and answers. Scripted model; how well real models do is what each
 agent's eval set (``evals``) measures.

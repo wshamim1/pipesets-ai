@@ -1,5 +1,5 @@
 """
-extraction_reviews.py — the review queue for extracted fields (plan.md P1).
+extraction_reviews.py — the review queue for extracted fields.
 
 The Structured Extract tool (tools/data/structured_extract.py) files every field it extracts here
 as ``pending``, with its citation (page, quote) and whether the quote was found on that page.

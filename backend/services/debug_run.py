@@ -1,5 +1,5 @@
 """
-debug_run.py — step-through debugging of a canvas run in the Prompt Runner (plan.md F6).
+debug_run.py — step-through debugging of a canvas run in the Prompt Runner.
 
 The editor sends ``PromptRunRequest.debug``:
 

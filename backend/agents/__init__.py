@@ -1,5 +1,5 @@
 """
-Built-in agent registry (plan.md C11 step 3).
+Built-in agent registry.
 
 Every module in this package that defines ``AGENT`` / ``AGENTS`` (see agents/base.py) is registered
 when the package is first used — adding a built-in agent is adding one file. ``GET /api/agent-catalog``

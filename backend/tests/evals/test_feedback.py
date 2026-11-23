@@ -1,4 +1,4 @@
-"""Feedback on runs (plan.md F2): builders rate in the runner, chat-link visitors with the sealed token
+"""Feedback on runs: builders rate in the runner, chat-link visitors with the sealed token
 from the answer's done event, API callers through /v1; ratings replace each other per rater, are
 counted per version, stay inside their tenant and become eval cases. The tests are steps of one
 scenario, in order."""

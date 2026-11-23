@@ -1,4 +1,4 @@
-"""Saved agents (plan.md C11 step 2): a child agent saved from the canvas, with the tool and skill nodes
+"""Saved agents: a child agent saved from the canvas, with the tool and skill nodes
 wired to it, so it can be dropped into other pipelines.
 
 * ``saved_agents``: one row per agent in a project; ``spec`` is JSON (the child's settings, its tool /

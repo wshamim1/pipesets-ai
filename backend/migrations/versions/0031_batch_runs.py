@@ -1,4 +1,4 @@
-"""Batch runs (plan.md F5, services/batches.py): a published pipeline run once per input row.
+"""Batch runs (services/batches.py): a published pipeline run once per input row.
 
 * ``batch_runs``: the batch — pipeline, prompt template, how many rows may run at once
   (``concurrency``), retries and timeout per row, ``status`` running / done / cancelled.

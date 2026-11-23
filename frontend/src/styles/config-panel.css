@@ -523,7 +523,7 @@ input[type="checkbox"]:disabled {
   }
 }
 
-/* 🐞 Debug strip at the top of a node's config (NodeDebugSection, plan.md F6) */
+/* 🐞 Debug strip at the top of a node's config (NodeDebugSection) */
 .node-debug-section {
   display: flex;
   flex-direction: column;

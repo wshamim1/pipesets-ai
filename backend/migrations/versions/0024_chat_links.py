@@ -2,7 +2,7 @@
 
 * ``chat_links``: one row per link. ``token_hash`` finds the link from its URL; ``token_sealed`` is
   the same token encrypted under the master key, so the builder can copy the link again.
-  ``access`` is ``public`` (anyone with the link) for now; passcode / sign-in come later (plan.md C9).
+  ``access`` is ``public`` (anyone with the link) for now; passcode / sign-in come later.
 
 Revision ID: 0024_chat_links
 Revises: 0023_model_optimization_cases

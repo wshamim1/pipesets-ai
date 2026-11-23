@@ -6,7 +6,7 @@ import type { SavedAgentSpec } from './savedAgents'
 /**
  * Built-in agents (backend/agents/, GET /api/agent-catalog): the sidebar's Agents section, the
  * Specialist Role dropdown and the prompt a dropped starter begins with all read this, and
- * Settings → Agents installs them (plan.md C11 step 3).
+ * Settings → Agents installs them.
  *
  * Starters are a role and a prompt (Researcher, Writer, …). Tool-backed agents list the tools they
  * need — each need met by any one of several tools — and drop as a child plus those tool nodes.

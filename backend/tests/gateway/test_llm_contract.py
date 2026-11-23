@@ -1,5 +1,5 @@
 """
-Contract tests for the LLM gateway (plan.md A5 step 5).
+Contract tests for the LLM gateway.
 
 Every cassette in tests/gateway/llm_contract/ is replayed under every backend that speaks its wire
 format for the provider — our own adapter and LiteLLM — through the public gateway

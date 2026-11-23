@@ -1,7 +1,7 @@
 import type { DebugNodeFields } from '../types'
 
 /**
- * The node's own debug buttons (editor-only debugging, plan.md F6), at the card's top-left corner:
+ * The node's own debug buttons (editor-only debugging), at the card's top-left corner:
  * ● toggles a breakpoint (Prompt Runner runs pause before this node), 📌 opens the node's Debug
  * section to pin an output or change / remove the pin. Both stay visible while set; otherwise they
  * show on hover or when the node is selected. Child agents can be pinned but not paused.

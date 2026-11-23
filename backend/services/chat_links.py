@@ -2,8 +2,8 @@
 chat_links.py — a public URL that opens a chat with one published pipeline.
 
 A link looks like ``https://<public host>/c/pc_<32 url-safe chars>``. The token is the credential:
-anyone who has the URL can chat (``access = 'public'``; passcode and sign-in links are planned,
-plan.md C9). It can do nothing but run that one pipeline's latest published version, through
+anyone who has the URL can chat (``access = 'public'``; passcode and sign-in links are
+planned). It can do nothing but run that one pipeline's latest published version, through
 ``/v1/chat/{token}/…`` (routers/v1_chat.py), as the user who created the link, so that user's ACLs,
 budgets and middleware apply, and the link stops working when they lose access to the project.
 

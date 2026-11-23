@@ -1,4 +1,4 @@
-"""Structured extraction with field-level citations and the review queue (plan.md P1): field parsing,
+"""Structured extraction with field-level citations and the review queue: field parsing,
 quote checks against the cited page, the Structured Extract tool end to end (model stubbed), and
 /api/reviews decisions, audit trail and export to an eval dataset. Steps of one scenario, in order."""
 import asyncio
